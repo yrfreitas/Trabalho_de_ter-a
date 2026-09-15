@@ -3,13 +3,13 @@
 
 ---
 
-# Modelagem de Banco de Dados para a [NOME DA EMPRESA — substituir]
+# Modelagem de Banco de Dados para a JG Construções
 
-> **Antes de entregar:** troque `[NOME DA EMPRESA — substituir]` (aparece no título e ao longo do texto) pelo nome real da organização escolhida pelo grupo, e preencha as partes marcadas com *(preencher)* — são os dados que só quem fez a visita de campo tem.
+> **Antes de entregar:** preencha as partes marcadas com *(preencher)* — são os dados que só quem fez a visita de campo tem (endereço, fotos, contato).
 
 ## Introdução
 
-A [NOME DA EMPRESA] é uma empresa de reformas e pequenas obras que atende clientes pessoa física e jurídica, do orçamento inicial até a entrega da obra concluída. Antes de qualquer sistema, o controle de orçamentos, obras em andamento, equipe alocada e compra de material era feito de forma manual, sem um cadastro único que ligasse essas informações.
+A JG Construções é uma empresa de reformas e pequenas obras que atende clientes pessoa física e jurídica, do orçamento inicial até a entrega da obra concluída. Antes de qualquer sistema, o controle de orçamentos, obras em andamento, equipe alocada e compra de material era feito de forma manual, sem um cadastro único que ligasse essas informações.
 
 O objetivo deste trabalho é levantar os processos reais da organização e propor um modelo conceitual de banco de dados capaz de sustentar essa operação: do primeiro orçamento pedido por um cliente até o pagamento da última etapa da obra, passando por quem trabalhou nela e qual material foi comprado para executá-la.
 
@@ -20,7 +20,7 @@ A delimitação desta primeira entrega é o **núcleo do ciclo orçamento → ob
 ### Caracterização da Organização
 *(vale 7,5% — Dimensão Conceitual)*
 
-- **Nome e natureza da organização:** [NOME DA EMPRESA] — empresa privada com fins lucrativos, do ramo de reformas e construção civil de pequeno porte.
+- **Nome e natureza da organização:** JG Construções — empresa privada com fins lucrativos, do ramo de reformas e construção civil de pequeno porte.
 - **Contexto e porte:** *(preencher: quantos funcionários/prestadores fixos, quantas obras costuma ter em andamento ao mesmo tempo, área de atuação — bairro, cidade, região)*
 - **Problemas e necessidades identificados:** antes do sistema proposto, orçamentos, obras, alocação de equipe e compra de material eram controlados de forma manual/dispersa, sem um cadastro único de clientes nem histórico organizado de qual funcionário trabalhou em qual obra, ou quanto foi gasto em material por obra.
 - **Justificativa da escolha:** a organização foi escolhida porque o grupo tem acesso direto para levantamento de requisitos e verificação das regras de negócio com quem de fato administra a empresa.
