@@ -37,14 +37,13 @@ Contato: (11) 8161-3422 · jovaldo.santos@hotmail.com
 
 
 **Principais processos mapeados:**
-
-1. **Cadastro de cliente** — nome, CPF/CNPJ, telefone, e-mail e endereço.
-2. **Orçamento** — a partir de um catálogo de serviços (com valor de referência), monta-se um orçamento para o cliente, item a item, com validade e valor total.
-3. **Abertura da obra** — orçamento aprovado pelo cliente vira uma obra: endereço da obra, escopo, data de início/fim previstas.
-4. **Alocação de equipe** — funcionários (fixos ou por vínculo temporário) são alocados na obra, cada um com sua função e período de atuação.
-5. **Compra de material** — a obra gera compras de material junto a fornecedores, item a item, para execução dos serviços orçados.
-6. **Execução dos serviços da obra** — cada serviço do orçamento é executado na obra, com quantidade executada e status próprio (pode divergir do que foi orçado).
-7. **Pagamento por etapa** — o cliente paga a obra em etapas, cada uma com valor, forma de pagamento e status.
+1. *Cadastro de cliente* — nome, CPF/CNPJ, telefone, e-mail e endereço.
+2. *Cadastro de obras*— registro de uma obra com endereço, cliente responsável, tipo de serviço e período de execução.
+3. *Cadastro de serviços* — registro do catálogo de serviços oferecidos (pintura, elétrica, hidráulica, acabamento, manutenção etc.).
+4. *Orçamento* — a partir de um catálogo de serviços (com valor de referência), monta-se um orçamento para o cliente, item a item, com validade e valor total.
+5. *Fechamento/associação de serviços à obra*— vínculo dos serviços efetivamente contratados a uma obra específica.
+6. *Execução e acompanhamento da obra* — controle do status (planejada, em andamento, pausada, concluída).
+7. *Registro de pagamentos* — lançamento dos pagamentos referentes a serviços/obras.
 
 **Fluxogramas:**
 
