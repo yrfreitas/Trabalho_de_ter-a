@@ -5,7 +5,6 @@
 
 # Modelagem de Banco de Dados para a JG Construções
 
-> **Antes de entregar:** preencha as partes marcadas com *(preencher)* — são os dados que só quem fez a visita de campo tem (endereço, fotos, contato).
 
 ## Introdução
 
