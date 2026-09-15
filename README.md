@@ -47,7 +47,18 @@ Contato: (11) 8161-3422 · jovaldo.santos@hotmail.com
 7. **Pagamento por etapa** — o cliente paga a obra em etapas, cada uma com valor, forma de pagamento e status.
 
 **Fluxogramas:**
-*(anexar imagem — ver seção de anexos do repositório)*
+
+**1. Cadastro de cliente**
+
+![Fluxograma - Cadastro de Cliente](fluxograma.cadastrado-cliente.jpeg)
+
+**2. Comercial (orçamento)**
+
+![Fluxograma - Comercial](fluxograma.comercial.jpeg)
+
+**3. Execução da obra**
+
+![Fluxograma - Execução](fluxograma.execucao.jpeg)
 
 Fluxo principal, em texto, para orientar o desenho do fluxograma:
 
