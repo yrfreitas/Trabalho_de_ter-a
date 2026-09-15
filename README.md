@@ -8,9 +8,9 @@
 
 ## Introdução
 
-A JG Construções é uma empresa de reformas e pequenas obras que atende clientes pessoa física e jurídica, do orçamento inicial até a entrega da obra concluída. Antes de qualquer sistema, o controle de orçamentos, obras em andamento, equipe alocada e compra de material era feito de forma manual, sem um cadastro único que ligasse essas informações.
+A JG Construções LTDA é uma empresa de pequeno/médio porte do ramo da construção civil que atualmente não possui nenhum sistema informatizado de gestão: informações de clientes, obras, orçamentos, serviços prestados e pagamentos ficam espalhadas entre planilhas, anotações em papel e conversas informais. Esse cenário dificulta o controle do andamento das obras, a consulta rápida de dados e a geração de relatórios gerenciais.
 
-O objetivo deste trabalho é levantar os processos reais da organização e propor um modelo conceitual de banco de dados capaz de sustentar essa operação: do primeiro orçamento pedido por um cliente até o pagamento da última etapa da obra, passando por quem trabalhou nela e qual material foi comprado para executá-la.
+Objetivo desse trabalho é criar um sistema centralizado para armazenar, organizar, consultar e proteger as informações da empresa, facilitando o gerenciamento das obras e dos serviços prestados.
 
 A delimitação desta primeira entrega é o **núcleo do ciclo orçamento → obra**: cadastro de cliente, orçamento de serviços, execução da obra com equipe alocada, compra de material junto a fornecedores e controle de pagamento por etapa.
 
