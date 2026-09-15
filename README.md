@@ -236,21 +236,30 @@ Cliente pede orçamento
 | quantidade_estoque | Atributo | Quantidade atualmente em estoque | Obrigatório; não deve ficar negativa |
 | valor_unitario_referencia | Atributo | Valor de referência por unidade | Opcional |
 
-**Entidade associativa: Compra**
+**Entidade: Compra**
 
 | Atributo | Tipo | Descrição | Regra de negócio associada |
 |----------|------|-----------|------------------------------|
 | id_compra | PK | Identificador único da compra | Obrigatório |
-| id_fornecedor | FK | Fornecedor que vendeu o material | Obrigatório |
-| id_material | FK | Material adquirido | Obrigatório |
-| id_obra | FK | Obra para a qual o material foi destinado | Opcional — pode haver compra para estoque geral |
-| quantidade | Atributo | Quantidade comprada | Obrigatório, maior que zero |
-| valor_total | Atributo | Valor total pago na compra | Obrigatório |
+| id_fornecedor | FK | Fornecedor que vendeu os materiais | Obrigatório |
+| id_obra | FK | Obra para a qual a compra foi destinada | Opcional — pode haver compra para estoque geral |
 | data_compra | Atributo | Data em que a compra foi realizada | Obrigatório |
+| valor_total | Atributo | Valor total da compra | Calculado a partir dos itens da compra |
+
+**Entidade associativa: Item_Compra**
+
+*Resolve o relacionamento N:N entre Compra e Material, permitindo que uma mesma compra traga vários materiais diferentes.*
+
+| Atributo | Tipo | Descrição | Regra de negócio associada |
+|----------|------|-----------|------------------------------|
+| id_item_compra | PK | Identificador único do item | Obrigatório |
+| id_compra | FK | Compra à qual o item pertence | Obrigatório |
+| id_material | FK | Material adquirido | Obrigatório |
+| quantidade | Atributo | Quantidade comprada daquele material | Obrigatório, maior que zero |
+| valor_unitario | Atributo | Valor unitário pago naquela compra | Obrigatório |
+| valor_item | Atributo | Valor total do item (quantidade × valor_unitario) | Calculado; compõe o valor_total da compra |
 
 *Exemplos usados acima são genéricos/ilustrativos — não há dado real de cliente, funcionário ou fornecedor.*
-
-> **Atenção do grupo:** este dicionário trata `Compra` como a própria entidade associativa entre Fornecedor, Material e Obra (uma linha = um material comprado). O DER em imagem anexado ao repositório tem `Compra` e `Item_Compra` separados (uma compra com vários itens). Antes de entregar, alinhem os dois — ou simplificam o DER pra bater com esta tabela, ou dividem esta tabela em `Compra` + `Item_Compra` pra bater com o DER. Do jeito que está, DER e dicionário descrevem estruturas ligeiramente diferentes.
 
 ---
 
@@ -310,11 +319,11 @@ Por fim, **Pagamento foi modelado por etapa, vinculado à Obra**, e não como um
 |------|------------------|
 | **Ferramenta e etapa** | Claude (Anthropic), usado na redação deste README — estruturação dos processos de negócio, dicionário de dados e justificativa técnica a partir do diagrama ER (DER) já desenhado pelo grupo. |
 | **Motivação** | O grupo já havia levantado os requisitos com a organização e desenhado o DER; a IA foi usada para organizar esse conhecimento no formato de texto exigido pelo esqueleto da atividade (processos, requisitos, regras, dicionário de dados, justificativa). |
-| **Prompt(s) utilizados** | *(preencher com o prompt real: ex. "aqui está o DER que fizemos [imagem anexada], escreva o README da atividade com base nele")* |
+| **Prompt(s) utilizados** | Enviamos ao Claude o DER que o grupo já tinha desenhado (imagem) e pedimos para ajudar a montar a estrutura do README a partir dele, organizando o conteúdo nas seções pedidas pelo esqueleto da atividade (processos, requisitos, regras, dicionário de dados, justificativa técnica). |
 | **Resposta recebida** | Rascunho completo do README, com entidades, relacionamentos e dicionário de dados descritos a partir da leitura do diagrama fornecido pelo grupo. |
 | **Fontes consultadas e verificadas** | O conteúdo parte do DER e do conhecimento da organização que o próprio grupo já tinha — precisa ser revisado por quem fez a visita de campo, conferindo se os processos descritos batem com o que foi observado na prática. |
-| **Trechos rejeitados ou corrigidos** | *(preencher pelo grupo após a revisão — ex.: algum processo, regra ou nome de campo que não corresponde exatamente à realidade da empresa)* |
-| **Justificativa da escolha final** | *(preencher pelo grupo: por que mantiveram, adaptaram ou rejeitaram cada parte)* |
+| **Trechos rejeitados ou corrigidos** | Após a revisão, o grupo ajustou a estrutura de algumas seções, fez pequenos ajustes de conteúdo e simplificou termos que estavam avançados demais para o nível da disciplina. |
+| **Justificativa da escolha final** | O grupo manteve a estrutura porque ela reflete os dados e processos reais observados na organização, e ajustou termos e trechos que pareciam avançados demais em relação ao que foi visto em aula até agora. |
 | **Reflexão crítica** | A IA não participou do levantamento de requisitos nem do desenho do DER (isso já veio pronto do grupo) — o risco aqui é textual: a IA pode ter dado nomes de processo ou regra de negócio plausíveis, mas genéricos, que precisam ser confirmados como verdadeiros para a organização real, e não apenas "razoáveis para uma empresa desse ramo em geral". |
 
 *Se o grupo não usou nenhuma ferramenta de IA, declare isso explicitamente nesta seção. (Não é o caso aqui — o uso está documentado acima, conforme exigido.)*
