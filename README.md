@@ -18,7 +18,6 @@ A delimitação desta primeira entrega é o **núcleo do ciclo orçamento → ob
 ## Desenvolvimento
 
 ### Caracterização da Organização
-*(vale 7,5% — Dimensão Conceitual)*
 
 - **Nome e natureza da organização:** JG Construções — empresa privada com fins lucrativos, do ramo de reformas e construção civil de pequeno porte.
 - **Contexto e porte:** *(preencher: quantos funcionários/prestadores fixos, quantas obras costuma ter em andamento ao mesmo tempo, área de atuação — bairro, cidade, região)*
@@ -30,7 +29,7 @@ A delimitação desta primeira entrega é o **núcleo do ciclo orçamento → ob
 ---
 
 ### Processos de Negócio
-*(vale 10% — Dimensão Procedimental)*
+
 
 **Principais processos mapeados:**
 
@@ -61,7 +60,6 @@ Cliente pede orçamento
 ---
 
 ### Requisitos do Sistema
-*(esta seção e a Seção 4 "Regras de Negócio" DIVIDEM 7,5% na dimensão conceitual — juntas valem 7,5%, não 7,5% cada — + 4% exclusivos desta seção na organização/documentação)*
 
 #### Requisitos Funcionais
 
@@ -85,7 +83,6 @@ Cliente pede orçamento
 ---
 
 ### Regras de Negócio
-*(esta seção DIVIDE com a Seção 3 "Requisitos do Sistema" os mesmos 7,5% da dimensão conceitual — juntas valem 7,5%, não 7,5% cada — + 4% exclusivos desta seção na documentação)*
 
 - **Regras operacionais:**
   - Uma obra só pode ser aberta a partir de um orçamento aprovado pelo cliente (status do orçamento precisa refletir essa aprovação).
@@ -264,7 +261,6 @@ Cliente pede orçamento
 ---
 
 ### Modelagem Conceitual (Entidades, Atributos, Relacionamentos)
-*(vale 7,5% na dimensão conceitual)*
 
 **Entidades reconhecidas:** Cliente, Orçamento, Item de Orçamento, Serviço, Obra, Obra_Serviço, Funcionário, Alocação, Fornecedor, Compra, Item de Compra, Material, Pagamento.
 
@@ -295,14 +291,12 @@ Cliente pede orçamento
 ---
 
 ### Diagrama Entidade-Relacionamento (DER)
-*(vale 20% — é o item de maior peso da entrega)*
 
 Ver arquivo `der.jpeg` anexado neste repositório, com as 13 entidades descritas acima, seus atributos e as cardinalidades de cada relacionamento (Cliente 1:N Orçamento/Obra; Orçamento 1:N Item_Orçamento; Serviço 1:N Item_Orçamento e 1:N Obra_Serviço; Obra 1:N Obra_Serviço, 1:N Alocação, 1:N Compra, 1:N Pagamento; Funcionário 1:N Alocação; Fornecedor 1:N Compra; Compra 1:N Item_Compra; Material 1:N Item_Compra).
 
 ---
 
 ### Justificativa Técnica
-*(vale 7,5% — sozinho, é o subcritério de maior peso dentro da Dimensão Conceitual)*
 
 A decisão central do modelo foi **separar o que foi orçado (Item_Orçamento) do que foi de fato executado (Obra_Serviço)**, em vez de assumir que a obra sempre executa exatamente o que constava no orçamento. Na prática de uma obra, quantidade e escopo de um serviço podem mudar no meio do caminho (mais metros quadrados do que o previsto, um serviço cancelado). Um único registro que misturasse "orçado" e "executado" perderia essa diferença — e é justamente essa diferença que a empresa precisa para saber se está ganhando ou perdendo dinheiro numa obra em relação ao que foi vendido ao cliente.
 
@@ -338,17 +332,9 @@ Por fim, **Pagamento foi modelado por etapa, vinculado à Obra**, e não como um
 
 ---
 
-## Critérios Atitudinais (20%)
+## Critérios Atitudinais 
 *(avaliados por Avaliação 360º entre os integrantes do grupo — não é conteúdo deste README)*
 
----
 
-## Resumo dos Pesos
 
-| Dimensão | Peso total |
-|----------|-----------|
-| Conceitual (contexto, requisitos/regras, modelagem, justificativa técnica) | 30% |
-| Procedimental (requisitos, fluxogramas, dicionário de dados, DER) | 50% |
-| Atitudinal (participação, comprometimento, colaboração, autonomia) | 20% |
 
-**Entrega final:** README.md completo + DER anexado no repositório GitHub do grupo.
