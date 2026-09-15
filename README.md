@@ -19,11 +19,17 @@ A delimitação desta primeira entrega é o **núcleo do ciclo orçamento → ob
 ### Caracterização da Organização
 
 - **Nome e natureza da organização:** JG Construções — empresa privada com fins lucrativos, do ramo de reformas e construção civil de pequeno porte.
-- **Contexto e porte:** *(preencher: quantos funcionários/prestadores fixos, quantas obras costuma ter em andamento ao mesmo tempo, área de atuação — bairro, cidade, região)*
+- **Contexto e porte:** *empresa registrada como ME (microempresa) junto à Receita Federal, mas que opera atualmente com cerca de 20 ou mais pessoas envolvidas entre equipe efetiva e prestadores/subcontratados nas obras.
 - **Problemas e necessidades identificados:** antes do sistema proposto, orçamentos, obras, alocação de equipe e compra de material eram controlados de forma manual/dispersa, sem um cadastro único de clientes nem histórico organizado de qual funcionário trabalhou em qual obra, ou quanto foi gasto em material por obra.
-- **Justificativa da escolha:** a organização foi escolhida porque o grupo tem acesso direto para levantamento de requisitos e verificação das regras de negócio com quem de fato administra a empresa.
-- **Evidências da organização:**
-  *(preencher: foto do local/de uma obra em andamento, link do Google Meu Negócio ou rede social da empresa, endereço completo e telefone/e-mail de contato do responsável)*
+- **Justificativa da escolha:**  A empresa foi escolhida por apresentar uma necessidade de melhorar a organização de informações sobre clientes, serviços e orçamentos. O desenvolvimento de um sistema pode facilitar essas atividades, tornando o trabalho mais rápido e organizado.
+- **Evidências da organização:** Nome e natureza da organização: JG Construções LTDA
+ (nome fantasia: JG Construções), Sociedade Empresária Limitada, com fins lucrativos.
+CNPJ: 63.489.213/0001-49 (Matriz)
+Situação cadastral: Ativa (desde 03/11/2025)
+Endereço: R. Alberta Hunter, 761, Vila Brasil, São Paulo – SP, CEP 08.210-681
+Contato: (11) 8161-3422 · jovaldo.santos@hotmail.com
+
+
 
 ---
 
