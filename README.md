@@ -330,11 +330,125 @@ Status:
 
 #### Requisitos Não Funcionais
 
-- **Integridade:** um orçamento não deve poder virar obra sem ter ao menos um item orçado.
-- **Rastreabilidade:** toda compra de material deve manter o vínculo com o fornecedor e com a obra que a originou, para conferência de custo por obra.
-- **Consistência financeira:** a soma dos pagamentos de uma obra deve poder ser confrontada com o valor total do orçamento que a originou.
-- **Usabilidade:** o cadastro de uma nova obra a partir de um orçamento já aprovado não deve exigir redigitar os dados do cliente ou dos serviços.
+RNF01 – Segurança
 
+O sistema deve garantir a proteção dos dados armazenados e restringir o acesso às informações de acordo com o nível de autorização de cada usuário.
+
+Especificações:
+
+* Login e senha para acesso;
+* Senhas armazenadas de forma segura;
+* Controle de permissões;
+* Bloqueio de acesso a usuários não autorizados;
+* Encerramento de sessão após período de inatividade;
+* Registro das principais ações realizadas pelos usuários.
+
+⸻
+
+RNF02 – Desempenho
+
+O sistema deve apresentar bom desempenho durante as operações de cadastro, consulta, alteração e geração de relatórios.
+
+Especificações:
+
+* Consultas comuns devem apresentar resultados rapidamente;
+* O banco de dados deve possuir estrutura adequada para grandes quantidades de registros;
+* Índices devem ser utilizados quando necessários;
+* O sistema não deve apresentar lentidão significativa com o crescimento da base de dados.
+
+⸻
+
+RNF03 – Usabilidade
+
+A interface deve ser simples, intuitiva e fácil de utilizar.
+
+Especificações:
+
+* Menus organizados por categoria;
+* Botões e campos identificados claramente;
+* Formulários padronizados;
+* Mensagens de erro compreensíveis;
+* Confirmação antes de operações importantes, como exclusão;
+* Layout organizado;
+* Navegação simples;
+* Adaptação para diferentes tamanhos de tela, quando aplicável.
+
+⸻
+
+RNF04 – Disponibilidade
+
+O sistema deve estar disponível durante o horário de funcionamento da empresa.
+
+Especificações:
+
+* O sistema deve permanecer acessível durante o período de trabalho;
+* Manutenções programadas devem ser realizadas preferencialmente fora do horário de funcionamento;
+* Em caso de falha, o sistema deverá permitir recuperação dos dados por meio do backup;
+* Erros críticos devem ser registrados para análise.
+
+⸻
+
+RNF05 – Integridade dos dados
+
+O sistema deve garantir que os dados armazenados sejam corretos, completos e consistentes.
+
+Especificações:
+
+* Impedir cadastro duplicado de CPF/CNPJ;
+* Validar campos obrigatórios;
+* Validar formatos de e-mail e telefone;
+* Utilizar chaves primárias e estrangeiras no banco de dados;
+* Impedir a criação de relacionamentos inexistentes;
+* Evitar valores inválidos;
+* Manter a consistência entre clientes, obras, serviços e pagamentos.
+
+Exemplo: não deve ser possível associar uma obra a um cliente que não esteja cadastrado.
+
+⸻
+
+RNF06 – Backup
+
+O sistema deve realizar cópias de segurança periódicas dos dados armazenados.
+
+Especificações:
+
+* Realizar backups automaticamente;
+* Definir periodicidade para as cópias;
+* Armazenar backups em local seguro;
+* Manter mais de uma cópia quando possível;
+* Permitir recuperação dos dados em caso de falha;
+* Restringir o acesso aos arquivos de backup.
+
+⸻
+
+RNF07 – Escalabilidade
+
+O sistema deve permitir o crescimento da quantidade de informações sem comprometer significativamente seu funcionamento.
+
+Especificações:
+
+* Suportar aumento no número de clientes;
+* Suportar aumento no número de obras;
+* Suportar aumento no número de serviços;
+* Suportar aumento no número de funcionários e prestadores;
+* Permitir expansão futura das funcionalidades;
+* Utilizar estrutura de banco de dados preparada para crescimento.
+
+⸻
+
+RNF08 – Privacidade
+
+O sistema deve proteger os dados pessoais dos clientes, funcionários e prestadores, seguindo os princípios estabelecidos pela Lei Geral de Proteção de Dados (LGPD).
+
+Especificações:
+
+* Coletar somente os dados necessários para as finalidades do sistema;
+* Restringir o acesso a informações pessoais;
+* Permitir acesso aos dados conforme autorização;
+* Proteger os dados contra acesso não autorizado;
+* Evitar exposição desnecessária de informações pessoais;
+* Manter registros e procedimentos adequados para tratamento dos dados;
+* Permitir a exclusão ou correção de dados quando aplicável e conforme as regras legais.
 ---
 
 ### Regras de Negócio
