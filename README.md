@@ -75,8 +75,6 @@ Cliente pede orçamento
 
 #### Requisitos Funcionais
 
-Requisitos Funcionais
-
 RF01 – Cadastrar clientes
 
 O sistema deve permitir o cadastro, consulta, alteração e exclusão dos dados dos clientes.
