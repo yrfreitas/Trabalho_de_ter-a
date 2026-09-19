@@ -73,19 +73,262 @@ Cliente pede orçamento
 
 ---
 
-### Requisitos do Sistema
-
 #### Requisitos Funcionais
 
-- O sistema deve permitir cadastrar um cliente com dados de contato e endereço.
-- O sistema deve permitir montar um orçamento para um cliente, com um ou mais itens de serviço, cada um com quantidade e valor.
-- O sistema deve permitir transformar um orçamento aprovado em uma obra.
-- O sistema deve permitir alocar um ou mais funcionários a uma obra, registrando função e período de atuação.
-- O sistema deve permitir registrar compras de material feitas para uma obra, associadas a um fornecedor.
-- O sistema deve permitir registrar a execução de cada serviço orçado dentro da obra.
-- O sistema deve permitir registrar pagamentos recebidos por etapa de uma obra.
-- O sistema deve permitir consultar o histórico de obras e orçamentos de um cliente.
-- O sistema deve permitir consultar quais funcionários trabalharam em qual obra.
+Requisitos Funcionais
+
+RF01 – Cadastrar clientes
+
+O sistema deve permitir o cadastro, consulta, alteração e exclusão dos dados dos clientes.
+
+Especificações:
+
+* Cadastrar nome completo ou razão social;
+* CPF ou CNPJ;
+* Telefone;
+* E-mail;
+* Endereço;
+* Data de cadastro;
+* Observações;
+* Permitir consultar clientes cadastrados;
+* Permitir alterar dados existentes;
+* Permitir excluir ou inativar um cadastro;
+* O sistema deve verificar se CPF/CNPJ já está cadastrado;
+* Campos obrigatórios não poderão ser deixados em branco.
+
+Usuário responsável: administrador ou funcionário autorizado.
+
+⸻
+
+RF02 – Cadastrar obras
+
+O sistema deve permitir registrar e gerenciar as obras contratadas pela empresa.
+
+Especificações:
+
+* Número ou código da obra;
+* Nome ou identificação da obra;
+* Cliente responsável;
+* Endereço da obra;
+* Tipo de serviço;
+* Data de início prevista;
+* Data de término prevista;
+* Data de término efetiva;
+* Descrição da obra;
+* Valor estimado;
+* Responsável pela obra;
+* Status da obra.
+
+Status possíveis:
+
+* Planejada;
+* Em andamento;
+* Pausada;
+* Concluída;
+* Cancelada.
+
+O sistema deve permitir consultar, alterar e atualizar as informações da obra.
+
+Usuário responsável: administrador, gestor ou funcionário autorizado.
+
+⸻
+
+RF03 – Cadastrar serviços
+
+O sistema deve permitir cadastrar e gerenciar os serviços oferecidos pela empresa.
+
+Exemplos:
+
+* Pintura;
+* Instalação elétrica;
+* Serviços hidráulicos;
+* Acabamento;
+* Manutenção;
+* Reforma;
+* Instalação de pisos;
+* Outros serviços de construção.
+
+Especificações:
+
+* Código do serviço;
+* Nome;
+* Descrição;
+* Categoria;
+* Valor estimado ou preço-base;
+* Unidade de medida, quando aplicável;
+* Status: ativo ou inativo.
+
+O sistema deve permitir alterar ou inativar serviços que não sejam mais oferecidos.
+
+⸻
+
+RF04 – Associar serviços às obras
+
+O sistema deve permitir relacionar um ou mais serviços a uma determinada obra.
+
+Especificações:
+
+* Identificar a obra;
+* Identificar o cliente;
+* Selecionar o serviço;
+* Informar profissional responsável;
+* Informar quantidade;
+* Informar valor do serviço;
+* Registrar data de início;
+* Registrar data de conclusão;
+* Informar status do serviço;
+* Adicionar observações.
+
+Uma obra poderá possuir vários serviços, e cada serviço poderá estar relacionado a diferentes obras.
+
+⸻
+
+RF05 – Cadastrar funcionários e prestadores
+
+O sistema deve permitir cadastrar os profissionais envolvidos na execução dos serviços.
+
+Especificações:
+
+* Nome completo;
+* CPF;
+* Telefone;
+* E-mail;
+* Endereço;
+* Cargo ou função;
+* Tipo de vínculo;
+* Especialidade;
+* Data de cadastro;
+* Status do profissional.
+
+O sistema deve diferenciar funcionários contratados pela empresa de prestadores de serviços terceirizados.
+
+⸻
+
+RF06 – Registrar orçamento
+
+O sistema deve permitir criar, consultar e gerenciar orçamentos solicitados pelos clientes.
+
+Especificações:
+
+* Número do orçamento;
+* Cliente;
+* Data de emissão;
+* Prazo de validade;
+* Serviços solicitados;
+* Quantidade;
+* Valores individuais;
+* Descontos, quando aplicável;
+* Valor total;
+* Forma de pagamento;
+* Prazo estimado para execução;
+* Observações;
+* Responsável pelo orçamento.
+
+Status possíveis:
+
+* Em elaboração;
+* Enviado;
+* Aprovado;
+* Recusado;
+* Expirado;
+* Cancelado.
+
+O sistema deve calcular automaticamente o valor total do orçamento com base nos serviços cadastrados.
+
+⸻
+
+RF07 – Registrar pagamentos
+
+O sistema deve permitir registrar os pagamentos relacionados às obras e aos serviços contratados.
+
+Especificações:
+
+* Cliente;
+* Obra;
+* Orçamento ou serviço relacionado;
+* Data do pagamento;
+* Valor pago;
+* Forma de pagamento;
+* Número ou identificação da parcela;
+* Status do pagamento;
+* Observações.
+
+Formas de pagamento:
+
+* Dinheiro;
+* PIX;
+* Cartão;
+* Transferência bancária;
+* Boleto;
+* Outras formas cadastradas.
+
+O sistema deve permitir consultar os pagamentos realizados e identificar valores pendentes.
+
+⸻
+
+RF08 – Consultar informações
+
+O sistema deve permitir pesquisar e consultar os dados armazenados no banco de dados.
+
+A pesquisa deverá permitir filtros por:
+
+* Cliente;
+* Obra;
+* Serviço;
+* Funcionário;
+* Prestador;
+* Orçamento;
+* Pagamento;
+* Status;
+* Período.
+
+O sistema deve apresentar os resultados de forma organizada e permitir acessar os detalhes do registro selecionado.
+
+⸻
+
+RF09 – Gerar relatórios
+
+O sistema deve permitir gerar relatórios para auxiliar no controle administrativo e operacional da empresa.
+
+Relatórios previstos:
+
+* Relatório de clientes cadastrados;
+* Relatório de obras;
+* Obras em andamento;
+* Obras concluídas;
+* Serviços realizados;
+* Serviços por obra;
+* Funcionários e prestadores;
+* Orçamentos aprovados e recusados;
+* Pagamentos realizados;
+* Pagamentos pendentes;
+* Valores recebidos por período.
+
+Os relatórios devem permitir filtros por período, cliente, obra e status, quando aplicável.
+
+⸻
+
+RF10 – Controlar o andamento das obras
+
+O sistema deve permitir acompanhar o andamento de cada obra.
+
+Especificações:
+
+* Registrar o status atual da obra;
+* Atualizar o status conforme o andamento;
+* Registrar data da alteração;
+* Identificar o responsável pela alteração;
+* Permitir visualizar o histórico de status;
+* Associar serviços e profissionais à obra;
+* Informar observações sobre o andamento.
+
+Status:
+
+1. Planejada;
+2. Em andamento;
+3. Pausada;
+4. Concluída;
+5. Cancelada.
 
 #### Requisitos Não Funcionais
 
