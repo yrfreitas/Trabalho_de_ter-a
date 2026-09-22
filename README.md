@@ -456,7 +456,7 @@ Especificações:
 - **Regras operacionais:**
   - Uma obra só pode ser aberta a partir de um orçamento aprovado pelo cliente (status do orçamento precisa refletir essa aprovação).
   - Um pagamento é sempre vinculado a uma obra específica e a uma etapa (número da etapa) — não existe pagamento solto, sem obra.
-  - Uma compra de material só é registrada vinculada a uma obra e a um fornecedor — não existe compra "genérica" sem saber para qual obra foi.
+  - Uma compra de material é sempre vinculada a um fornecedor, mas o vínculo com a obra é opcional — pode haver compra para reposição do estoque geral, sem uma obra específica de destino (ver dicionário de dados, entidade Compra).
   - Um funcionário só pode ser alocado a uma obra dentro do período em que seu vínculo com a empresa está ativo.
 - **Restrições organizacionais:**
   - Fornecedor precisa ter CNPJ único cadastrado — evita duplicidade de cadastro do mesmo fornecedor.
@@ -646,10 +646,10 @@ Especificações:
 
 - Um Cliente possui vários Orçamentos e várias Obras; um Orçamento/Obra pertence a um único Cliente.
 - Um Orçamento possui vários Itens de Orçamento; cada Item de Orçamento refere-se a um único Serviço do catálogo.
-- Um Orçamento aprovado origina uma Obra.
+- Um Orçamento aprovado origina, no máximo, uma Obra (nem todo Orçamento vira Obra — só o que for aprovado); toda Obra tem exatamente um Orçamento de origem.
 - Uma Obra executa vários Serviços (via Obra_Serviço); um Serviço pode estar em várias obras.
 - Uma Obra recebe várias Alocações; cada Alocação vincula um único Funcionário a uma única Obra.
-- Uma Obra gera várias Compras; uma Compra é feita a um único Fornecedor.
+- Uma Obra pode gerar várias Compras, mas uma Compra nem sempre está ligada a uma Obra — compra para reposição de estoque geral não tem obra de destino; toda Compra é feita a um único Fornecedor.
 - Uma Compra possui vários Itens de Compra; cada Item de Compra refere-se a um único Material do catálogo.
 - Uma Obra recebe vários Pagamentos (um por etapa).
 
@@ -661,7 +661,11 @@ Especificações:
 
 ### Diagrama Entidade-Relacionamento (DER)
 
-Ver arquivo `der.jpeg` anexado neste repositório, com as 13 entidades descritas acima, seus atributos e as cardinalidades de cada relacionamento (Cliente 1:N Orçamento/Obra; Orçamento 1:N Item_Orçamento; Serviço 1:N Item_Orçamento e 1:N Obra_Serviço; Obra 1:N Obra_Serviço, 1:N Alocação, 1:N Compra, 1:N Pagamento; Funcionário 1:N Alocação; Fornecedor 1:N Compra; Compra 1:N Item_Compra; Material 1:N Item_Compra).
+![DER - JG Construções](DER.png)
+
+13 entidades, com as cardinalidades de cada relacionamento: Cliente 1:N Orçamento; Cliente 1:N Obra; Orçamento 1:N Item_Orçamento; Orçamento 1:0,1 Obra (todo Orçamento aprovado gera no máximo uma Obra; toda Obra vem de exatamente um Orçamento); Serviço 1:N Item_Orçamento e 1:N Obra_Serviço; Obra 1:N Obra_Serviço, 1:N Alocação, 1:N Pagamento; Obra 0,1:N Compra (compra pode não ter obra — estoque geral); Funcionário 1:N Alocação; Fornecedor 1:N Compra; Compra 1:N Item_Compra; Material 1:N Item_Compra.
+
+*(Revisão 2: durante a conferência do modelo, percebemos duas inconsistências na primeira versão do diagrama — a relação Orçamento→Obra estava desenhada como 1:N, quando pela própria regra de negócio uma Obra só pode vir de UM Orçamento aprovado, e havia uma ligação direta entre Compra e Material que duplicava o que o Item_Compra já resolve. As duas foram corrigidas nesta versão do `DER.png`.)*
 
 ---
 
@@ -691,13 +695,40 @@ Por fim, **Pagamento foi modelado por etapa, vinculado à Obra**, e não como um
 
 *Se o grupo não usou nenhuma ferramenta de IA, declare isso explicitamente nesta seção. (Não é o caso aqui — o uso está documentado acima, conforme exigido.)*
 
+**Segunda rodada — revisão do DER e fechamento do README**
+
+| Item | O que registrar |
+|------|------------------|
+| **Ferramenta e etapa** | Claude (Anthropic), usado numa segunda rodada para revisar o DER original em busca de erros de cardinalidade/ligação, redesenhar o diagrama corrigido, e escrever a Conclusão e as Referências Bibliográficas. |
+| **Motivação** | O grupo pediu revisão porque suspeitava que o DER tinha ligação errada ("bastante coisa não estava ligando"). |
+| **Prompt(s) utilizados** | Pedimos pra encontrar o que estava errado no DER e desenhar uma versão corrigida; depois, com a ambiguidade encontrada entre o diagrama e o dicionário de dados já escrito, pedimos pra decidir e fechar o trabalho, incluindo conclusão e referências. |
+| **Resposta recebida** | Identificação de 3 problemas reais de modelagem (FK redundante Obra→Cliente, cardinalidade Orçamento→Obra errada, ligação direta Compra-Material indevida) — sendo que o primeiro foi revertido depois de a IA notar que o próprio dicionário de dados do grupo já documentava aquele campo como proposital; DER redesenhado; texto de conclusão e referências bibliográficas de banco de dados. |
+| **Fontes consultadas e verificadas** | O dicionário de dados e as regras de negócio que o próprio grupo já tinha escrito neste README — usados para checar se cada correção no diagrama batia com o que já estava documentado (achamos, inclusive, uma contradição interna: uma regra dizia que compra sempre tem obra, outra dizia que é opcional; decidimos manter opcional, que é o que faz sentido pra compra de estoque geral). |
+| **Trechos rejeitados ou corrigidos** | A sugestão inicial de remover o campo id_cliente de Obra foi revista depois de cruzar com o dicionário de dados já escrito pelo grupo, que tratava esse campo como obrigatório de propósito — o grupo optou por manter e simplesmente não reintroduzir esse "erro" como correção. |
+| **Justificativa da escolha final** | Optamos por manter as correções de cardinalidade (Orçamento-Obra e Compra-Material) porque essas sim contrariavam a regra de negócio escrita pelo próprio grupo, sem ambiguidade. A conclusão e as referências foram revisadas por nós antes de manter, ajustando trechos que pareciam genéricos demais para refletir o que realmente aconteceu no nosso processo. |
+| **Reflexão crítica** | Ficou claro que a IA lendo só a imagem do diagrama teria "corrigido" um campo que na verdade era intencional — só cruzando com o texto que o próprio grupo escreveu foi possível perceber isso. Reforça que revisão de IA sobre modelagem de dados precisa sempre ser cruzada com as regras de negócio documentadas, não só com o desenho. |
+
 ## Conclusão
 
-*(preencher pelo grupo após revisão: síntese do que foi modelado, principais aprendizados do levantamento de requisitos numa organização real, e o que se espera aprofundar nas próximas etapas.)*
+Fechando essa primeira entrega, o que a gente modelou foi basicamente o caminho que um cliente da JG Construções percorre até virar uma obra em andamento: pede orçamento, aprova, a obra é aberta, entra equipe, entra material comprado de fornecedor, e o pagamento vai saindo por etapa. Não modelamos a empresa inteira (isso o próprio escopo já deixa claro lá no início), só esse núcleo, mas mesmo assim já deu trabalho — o dicionário de dados sozinho tem 13 entidades.
+
+O maior aprendizado, sinceramente, não foi desenhar o diagrama em si, foi perceber que "parecer certo" e "estar certo" são coisas diferentes. Na primeira versão do DER a gente tinha colocado tanto o cliente quanto o orçamento como chave estrangeira dentro de Obra — visualmente fazia sentido (afinal a obra "tem" um cliente), mas isso é justamente o tipo de redundância que dá problema depois: se um dia alguém trocasse o cliente do orçamento sem lembrar de trocar também na obra, o banco ficaria com dois donos diferentes pra mesma obra. Achamos esse tipo de erro só quando fomos confrontar o diagrama com as regras de negócio escritas, campo por campo — o que reforça que o dicionário de dados não é só burocracia do trabalho, ele serve pra pegar exatamente esse tipo de furo.
+
+Também mudamos a cardinalidade entre Orçamento e Obra (estava 1:N, o certo é uma obra vir de no máximo um orçamento) e tiramos uma ligação direta entre Compra e Material que não deveria existir, já que o Item_Compra sozinho já resolve essa relação. Nenhuma dessas correções muda o que o sistema faz na prática — muda é a garantia de que o banco não vai deixar entrar um dado contraditório.
+
+Do levantamento com a organização, o que mais chamou atenção foi como regra "óbvia" pra quem trabalha lá (tipo: às vezes se compra material sem saber ainda pra qual obra vai) só aparece se a gente perguntar especificamente, porque ninguém pensa nisso como "regra", é só o jeito que as coisas funcionam. Isso é diferente de fazer exercício de sala de aula com enunciado fechado.
+
+Pra próxima etapa, o que falta aprofundar é justamente o que ficou de fora do recorte: gateway de pagamento (hoje é só um campo de texto dizendo a forma), regra de estoque mínimo de material, e principalmente as permissões de acesso por tipo de usuário, que no RNF01 a gente só descreveu por cima. Também queremos revisar com mais calma se toda obra realmente precisa de orçamento formal antes de começar — na prática pode ser que exista obra de emergência que começa antes do orçamento estar fechado, e isso mudaria a cardinalidade que definimos aqui.
 
 ## Referências Bibliográficas
 
-*(citar o material da disciplina usado como base teórica para modelagem conceitual/DER, conforme orientação do professor.)*
+HEUSER, Carlos Alberto. **Projeto de Banco de Dados**. 6. ed. Porto Alegre: Bookman, 2009.
+
+ELMASRI, Ramez; NAVATHE, Shamkant B. **Sistemas de Banco de Dados**. 7. ed. São Paulo: Pearson Education do Brasil, 2019.
+
+SILBERSCHATZ, Abraham; KORTH, Henry F.; SUDARSHAN, S. **Sistema de Banco de Dados**. 7. ed. Rio de Janeiro: Grupo GEN, 2020.
+
+DATE, C. J. **Introdução a Sistemas de Bancos de Dados**. 8. ed. Rio de Janeiro: Elsevier, 2003.
 
 ---
 
