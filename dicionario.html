@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dicionário de Dados - JG Construções</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f4f6f8;
+            color: #222;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitulo {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .entidade {
+            margin-bottom: 40px;
+        }
+
+        .entidade h2 {
+            background-color: #222;
+            color: white;
+            padding: 14px 18px;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .associativa h2 {
+            background-color: #444;
+        }
+
+        .tabela {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #e9ecef;
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ccc;
+        }
+
+        td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tr:hover {
+            background-color: #eef2f5;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+
+            th,
+            td {
+                font-size: 14px;
+                padding: 9px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Dicionário de Dados Conceitual (Preliminar)</h1>
+
+    <p class="subtitulo">
+        Sistema de Gestão de Informações — JG Construções LTDA
+    </p>
+
+
+    <!-- ========================= -->
+    <!-- CLIENTE -->
+    <!-- ========================= -->
+
+    <section class="entidade">
+
+        <h2>Entidade: Cliente</h2>
+
+        <div class="tabela">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>id_cliente</td>
+                        <td>Identificador único do cliente</td>
+                        <td>Obrigatório, gerado pelo sistema</td>
+                    </tr>
+
+                    <tr>
+                        <td>nome</td>
+                        <td>Nome completo ou razão social</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>tipo_pessoa</td>
+                        <td>Pessoa física ou jurídica</td>
+                        <td>Obrigatório; define se usa CPF ou CNPJ</td>
+                    </tr>
+
+                    <tr>
+                        <td>cpf_cnpj</td>
+                        <td>Documento de identificação</td>
+                        <td>Obrigatório, único</td>
+                    </tr>
+
+                    <tr>
+                        <td>telefone</td>
+                        <td>Telefone de contato</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>email</td>
+                        <td>E-mail de contato</td>
+                        <td>Opcional</td>
+                    </tr>
+
+                    <tr>
+                        <td>endereço</td>
+                        <td>Endereço do cliente</td>
+                        <td>Opcional</td>
+                    </tr>
+
+                    <tr>
+                        <td>data_cadastro</td>
+                        <td>Data em que o cliente foi cadastrado</td>
+                        <td>Obrigatório, gerado pelo sistema</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- OBRA -->
+    <!-- ========================= -->
+
+    <section class="entidade">
+
+        <h2>Entidade: Obra</h2>
+
+        <div class="tabela">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>id_obra</td>
+                        <td>Identificador único da obra</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>endereço_obra</td>
+                        <td>Local onde a obra será executada</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>id_cliente</td>
+                        <td>Cliente responsável pela obra</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>id_orcamento</td>
+                        <td>Orçamento aprovado que originou a obra</td>
+                        <td>Obrigatório — obra só é criada a partir de um orçamento aprovado</td>
+                    </tr>
+
+                    <tr>
+                        <td>descricao_escopo</td>
+                        <td>Resumo do escopo da obra</td>
+                        <td>Opcional</td>
+                    </tr>
+
+                    <tr>
+                        <td>data_inicio</td>
+                        <td>Data de início prevista/real</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>data_fim</td>
+                        <td>Data de conclusão prevista/real</td>
+                        <td>Opcional até conclusão</td>
+                    </tr>
+
+                    <tr>
+                        <td>status</td>
+                        <td>Situação da obra</td>
+                        <td>Deve ser: planejada, em andamento, pausada ou concluída</td>
+                    </tr>
+
+                    <tr>
+                        <td>observacoes</td>
+                        <td>Anotações gerais sobre a obra</td>
+                        <td>Opcional</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- SERVIÇO -->
+    <!-- ========================= -->
+
+    <section class="entidade">
+
+        <h2>Entidade: Serviço</h2>
+
+        <div class="tabela">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>id_servico</td>
+                        <td>Identificador único do serviço</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>nome_servico</td>
+                        <td>Nome do serviço (ex.: pintura, elétrica)</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>categoria</td>
+                        <td>Categoria do serviço (ex.: acabamento, instalação, estrutura)</td>
+                        <td>Opcional</td>
+                    </tr>
+
+                    <tr>
+                        <td>unidade_medida</td>
+                        <td>Unidade de cobrança/medição (ex.: m², hora, unidade)</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>descricao</td>
+                        <td>Detalhamento do serviço</td>
+                        <td>Opcional</td>
+                    </tr>
+
+                    <tr>
+                        <td>valor_referencia</td>
+                        <td>Valor base de referência por unidade</td>
+                        <td>Opcional</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- FUNCIONÁRIO -->
+    <!-- ========================= -->
+
+    <section class="entidade">
+
+        <h2>Entidade: Funcionário/Prestador</h2>
+
+        <div class="tabela">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>id_funcionario</td>
+                        <td>Identificador único</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>nome</td>
+                        <td>Nome do profissional</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>funcao</td>
+                        <td>Função/especialidade (ex.: pedreiro, eletricista)</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>tipo_vinculo</td>
+                        <td>Efetivo ou terceirizado/subcontratado</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>telefone</td>
+                        <td>Telefone de contato</td>
+                        <td>Opcional</td>
+                    </tr>
+
+                    <tr>
+                        <td>data_inicio_vinculo</td>
+                        <td>Data de início do vínculo com a empresa</td>
+                        <td>Opcional</td>
+                    </tr>
+
+                    <tr>
+                        <td>status_cadastro</td>
+                        <td>Ativo ou inativo</td>
+                        <td>Só pode ser alocado a obras se ativo</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- ORÇAMENTO -->
+    <!-- ========================= -->
+
+    <section class="entidade">
+
+        <h2>Entidade: Orçamento</h2>
+
+        <div class="tabela">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>id_orcamento</td>
+                        <td>Identificador único</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>id_cliente</td>
+                        <td>Cliente solicitante</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>data_emissao</td>
+                        <td>Data de emissão do orçamento</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>data_validade</td>
+                        <td>Prazo de validade da proposta</td>
+                        <td>Opcional</td>
+                    </tr>
+
+                    <tr>
+                        <td>valor_total</td>
+                        <td>Valor total orçado</td>
+                        <td>Obrigatório, calculado a partir dos itens do orçamento</td>
+                    </tr>
+
+                    <tr>
+                        <td>status_orcamento</td>
+                        <td>Pendente, aprovado ou recusado</td>
+                        <td>Obra só pode ser aberta se aprovado</td>
+                    </tr>
+
+                    <tr>
+                        <td>observacoes</td>
+                        <td>Condições ou observações da proposta</td>
+                        <td>Opcional</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- ITEM ORÇAMENTO -->
+    <!-- ========================= -->
+
+    <section class="entidade associativa">
+
+        <h2>Entidade Associativa: Item_Orçamento</h2>
+
+        <div class="tabela">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>id_item_orcamento</td>
+                        <td>Identificador único do item</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>id_orcamento</td>
+                        <td>Orçamento ao qual o item pertence</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>id_servico</td>
+                        <td>Serviço orçado</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>quantidade</td>
+                        <td>Quantidade do serviço orçada</td>
+                        <td>Obrigatório, maior que zero</td>
+                    </tr>
+
+                    <tr>
+                        <td>valor_unitario</td>
+                        <td>Valor unitário aplicado no orçamento</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>valor_item</td>
+                        <td>Valor total do item (quantidade × valor_unitario)</td>
+                        <td>Calculado; compõe o valor_total do orçamento</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- OBRA SERVIÇO -->
+    <!-- ========================= -->
+
+    <section class="entidade associativa">
+
+        <h2>Entidade Associativa: Obra_Serviço</h2>
+
+        <div class="tabela">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>id_obra_servico</td>
+                        <td>Identificador único do vínculo</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>id_obra</td>
+                        <td>Obra relacionada</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>id_servico</td>
+                        <td>Serviço relacionado</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>quantidade_executada</td>
+                        <td>Quantidade efetivamente executada</td>
+                        <td>Opcional até execução</td>
+                    </tr>
+
+                    <tr>
+                        <td>valor_acordado</td>
+                        <td>Valor acordado para o serviço nessa obra</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>status_execucao</td>
+                        <td>Situação do serviço na obra</td>
+                        <td>Pendente, em execução ou concluído</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- PAGAMENTO -->
+    <!-- ========================= -->
+
+    <section class="entidade">
+
+        <h2>Entidade: Pagamento</h2>
+
+        <div class="tabela">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>id_pagamento</td>
+                        <td>Identificador único</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>id_obra</td>
+                        <td>Obra relacionada</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>numero_etapa</td>
+                        <td>Etapa/parcela a que o pagamento se refere</td>
+                        <td>Opcional</td>
+                    </tr>
+
+                    <tr>
+                        <td>valor</td>
+                        <td>Valor pago</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>data_pagamento</td>
+                        <td>Data do pagamento</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>forma_pagamento</td>
+                        <td>Ex.: PIX, boleto, transferência</td>
+                        <td>Opcional</td>
+                    </tr>
+
+                    <tr>
+                        <td>status_pagamento</td>
+                        <td>Pago, pendente ou atrasado</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- ALOCAÇÃO -->
+    <!-- ========================= -->
+
+    <section class="entidade associativa">
+
+        <h2>Entidade Associativa: Alocação</h2>
+
+        <div class="tabela">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>id_alocacao</td>
+                        <td>Identificador único da alocação</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>id_obra</td>
+                        <td>Obra em que o profissional atua</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>id_funcionario</td>
+                        <td>Profissional alocado</td>
+                        <td>Obrigatório; só pode ser alocado se status_cadastro = ativo</td>
+                    </tr>
+
+                    <tr>
+                        <td>funcao_na_obra</td>
+                        <td>Função exercida especificamente nessa obra</td>
+                        <td>Opcional</td>
+                    </tr>
+
+                    <tr>
+                        <td>data_inicio_alocacao</td>
+                        <td>Data de início da alocação na obra</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>data_fim_alocacao</td>
+                        <td>Data de término da alocação na obra</td>
+                        <td>Opcional até desligamento da obra</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- FORNECEDOR -->
+    <!-- ========================= -->
+
+    <section class="entidade">
+
+        <h2>Entidade: Fornecedor</h2>
+
+        <div class="tabela">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>id_fornecedor</td>
+                        <td>Identificador único do fornecedor</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>nome_fornecedor</td>
+                        <td>Nome/razão social do fornecedor</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>cnpj</td>
+                        <td>Documento de identificação</td>
+                        <td>Opcional</td>
+                    </tr>
+
+                    <tr>
+                        <td>telefone</td>
+                        <td>Telefone de contato</td>
+                        <td>Opcional</td>
+                    </tr>
+
+                    <tr>
+                        <td>email</td>
+                        <td>E-mail de contato</td>
+                        <td>Opcional</td>
+                    </tr>
+
+                    <tr>
+                        <td>endereço</td>
+                        <td>Endereço do fornecedor</td>
+                        <td>Opcional</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- MATERIAL -->
+    <!-- ========================= -->
+
+    <section class="entidade">
+
+        <h2>Entidade: Material</h2>
+
+        <div class="tabela">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>id_material</td>
+                        <td>Identificador único do material</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>nome_material</td>
+                        <td>Nome do material (ex.: cimento, tinta, fio elétrico)</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>unidade_medida</td>
+                        <td>Unidade de controle (ex.: kg, litro, unidade, saco)</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>quantidade_estoque</td>
+                        <td>Quantidade atualmente em estoque</td>
+                        <td>Obrigatório; não deve ficar negativa</td>
+                    </tr>
+
+                    <tr>
+                        <td>valor_unitario_referencia</td>
+                        <td>Valor de referência por unidade</td>
+                        <td>Opcional</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- COMPRA -->
+    <!-- ========================= -->
+
+    <section class="entidade">
+
+        <h2>Entidade: Compra</h2>
+
+        <div class="tabela">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>id_compra</td>
+                        <td>Identificador único da compra</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>id_fornecedor</td>
+                        <td>Fornecedor que vendeu os materiais</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>id_obra</td>
+                        <td>Obra para a qual a compra foi destinada</td>
+                        <td>Opcional — pode haver compra para estoque geral</td>
+                    </tr>
+
+                    <tr>
+                        <td>data_compra</td>
+                        <td>Data em que a compra foi realizada</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>valor_total</td>
+                        <td>Valor total da compra</td>
+                        <td>Calculado a partir dos itens da compra</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- ITEM COMPRA -->
+    <!-- ========================= -->
+
+    <section class="entidade associativa">
+
+        <h2>Entidade Associativa: Item_Compra</h2>
+
+        <div class="tabela">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>id_item_compra</td>
+                        <td>Identificador único do item</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>id_compra</td>
+                        <td>Compra à qual o item pertence</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>id_material</td>
+                        <td>Material adquirido</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>quantidade</td>
+                        <td>Quantidade comprada daquele material</td>
+                        <td>Obrigatório, maior que zero</td>
+                    </tr>
+
+                    <tr>
+                        <td>valor_unitario</td>
+                        <td>Valor unitário pago naquela compra</td>
+                        <td>Obrigatório</td>
+                    </tr>
+
+                    <tr>
+                        <td>valor_item</td>
+                        <td>Valor total do item (quantidade × valor_unitario)</td>
+                        <td>Calculado; compõe o valor_total da compra</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- RODAPÉ -->
+    <!-- ========================= -->
+
+    <footer>
+
+        Dicionário de Dados Conceitual (Preliminar)<br>
+        JG Construções LTDA
+
+    </footer>
+
+</div>
+
+</body>
+
+</html>
+
