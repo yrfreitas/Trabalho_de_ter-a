@@ -57,6 +57,19 @@
             background-color: #444;
         }
 
+        .relacionamento h2 {
+            background-color: #6a6a6a;
+        }
+
+        .nota {
+            font-style: italic;
+            color: #555;
+            background: #f4f4f4;
+            padding: 10px 14px;
+            border-radius: 0 0 8px 8px;
+            margin: 0;
+        }
+
         .tabela {
             overflow-x: auto;
         }
@@ -511,12 +524,14 @@
 
 
     <!-- ========================= -->
-    <!-- ITEM ORÇAMENTO -->
+    <!-- RELACIONAMENTO ORÇAMENTO-SERVIÇO -->
     <!-- ========================= -->
 
-    <section class="entidade associativa">
+    <section class="entidade relacionamento">
 
-        <h2>Entidade Associativa: Item_Orçamento</h2>
+        <h2>Relacionamento N:N com Atributos: Orçamento &mdash; compõe &mdash; Serviço</h2>
+
+        <p class="nota">Não é uma entidade própria (revisão do DER corrigiu isso — a versão anterior tinha "Item_Orçamento" ligada por dois losangos, um pro Orçamento e outro pro Serviço, o que não é uma leitura válida de um diagrama de Chen). Quantidade e valor por serviço orçado são atributos do PRÓPRIO relacionamento N:N entre Orçamento e Serviço.</p>
 
         <div class="tabela">
 
@@ -524,31 +539,13 @@
 
                 <thead>
                     <tr>
-                        <th>Atributo</th>
+                        <th>Atributo do relacionamento</th>
                         <th>Descrição</th>
                         <th>Regra de negócio associada</th>
                     </tr>
                 </thead>
 
                 <tbody>
-
-                    <tr>
-                        <td>id_item_orcamento</td>
-                        <td>Identificador único do item</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>id_orcamento</td>
-                        <td>Orçamento ao qual o item pertence</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>id_servico</td>
-                        <td>Serviço orçado</td>
-                        <td>Obrigatório</td>
-                    </tr>
 
                     <tr>
                         <td>quantidade</td>
@@ -974,12 +971,14 @@
 
 
     <!-- ========================= -->
-    <!-- ITEM COMPRA -->
+    <!-- RELACIONAMENTO COMPRA-MATERIAL -->
     <!-- ========================= -->
 
-    <section class="entidade associativa">
+    <section class="entidade relacionamento">
 
-        <h2>Entidade Associativa: Item_Compra</h2>
+        <h2>Relacionamento N:N com Atributos: Compra &mdash; compõe &mdash; Material</h2>
+
+        <p class="nota">Mesmo caso de Orçamento-Serviço: não é entidade própria. Quantidade e valor pago por material comprado são atributos do relacionamento N:N entre Compra e Material, não de uma "Item_Compra" separada.</p>
 
         <div class="tabela">
 
@@ -987,31 +986,13 @@
 
                 <thead>
                     <tr>
-                        <th>Atributo</th>
+                        <th>Atributo do relacionamento</th>
                         <th>Descrição</th>
                         <th>Regra de negócio associada</th>
                     </tr>
                 </thead>
 
                 <tbody>
-
-                    <tr>
-                        <td>id_item_compra</td>
-                        <td>Identificador único do item</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>id_compra</td>
-                        <td>Compra à qual o item pertence</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>id_material</td>
-                        <td>Material adquirido</td>
-                        <td>Obrigatório</td>
-                    </tr>
 
                     <tr>
                         <td>quantidade</td>
