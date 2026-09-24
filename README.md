@@ -531,15 +531,12 @@ Especificações:
 | status_orcamento | Atributo | Pendente, aprovado ou recusado | Obra só pode ser aberta se aprovado |
 | observacoes | Atributo | Condições ou observações da proposta | Opcional |
 
-**Entidade associativa: Item_Orçamento**
+**Relacionamento N:N com atributos: Orçamento _compõe_ Serviço**
 
-*Resolve o relacionamento N:N entre Orçamento e Serviço, permitindo detalhar quantidade e valor por serviço orçado.*
+*Não existe como tabela/entidade própria — quantidade e valor por serviço orçado são atributos do PRÓPRIO relacionamento entre Orçamento e Serviço (notação de Chen), não uma entidade associativa separada. Na implementação física isso ainda vira uma tabela de junção (orcamento_servico), mas conceitualmente no DER é um relacionamento, não uma entidade — diferença que a primeira versão deste diagrama errava.*
 
-| Atributo | Tipo | Descrição | Regra de negócio associada |
+| Atributo do relacionamento | Tipo | Descrição | Regra de negócio associada |
 |----------|------|-----------|------------------------------|
-| id_item_orcamento | PK | Identificador único do item | Obrigatório |
-| id_orcamento | FK | Orçamento ao qual o item pertence | Obrigatório |
-| id_servico | FK | Serviço orçado | Obrigatório |
 | quantidade | Atributo | Quantidade do serviço orçada | Obrigatório, maior que zero |
 | valor_unitario | Atributo | Valor unitário aplicado no orçamento | Obrigatório |
 | valor_item | Atributo | Valor total do item (quantidade × valor_unitario) | Calculado; compõe o valor_total do orçamento |
@@ -613,15 +610,12 @@ Especificações:
 | data_compra | Atributo | Data em que a compra foi realizada | Obrigatório |
 | valor_total | Atributo | Valor total da compra | Calculado a partir dos itens da compra |
 
-**Entidade associativa: Item_Compra**
+**Relacionamento N:N com atributos: Compra _compõe_ Material**
 
-*Resolve o relacionamento N:N entre Compra e Material, permitindo que uma mesma compra traga vários materiais diferentes.*
+*Mesmo caso de Orçamento-Serviço acima: quantidade e valor pago por material comprado são atributos do relacionamento entre Compra e Material, não uma entidade associativa própria.*
 
-| Atributo | Tipo | Descrição | Regra de negócio associada |
+| Atributo do relacionamento | Tipo | Descrição | Regra de negócio associada |
 |----------|------|-----------|------------------------------|
-| id_item_compra | PK | Identificador único do item | Obrigatório |
-| id_compra | FK | Compra à qual o item pertence | Obrigatório |
-| id_material | FK | Material adquirido | Obrigatório |
 | quantidade | Atributo | Quantidade comprada daquele material | Obrigatório, maior que zero |
 | valor_unitario | Atributo | Valor unitário pago naquela compra | Obrigatório |
 | valor_item | Atributo | Valor total do item (quantidade × valor_unitario) | Calculado; compõe o valor_total da compra |
@@ -632,31 +626,33 @@ Especificações:
 
 ### Modelagem Conceitual (Entidades, Atributos, Relacionamentos)
 
-**Entidades reconhecidas:** Cliente, Orçamento, Item de Orçamento, Serviço, Obra, Obra_Serviço, Funcionário, Alocação, Fornecedor, Compra, Item de Compra, Material, Pagamento.
+**Entidades reconhecidas:** Cliente, Orçamento, Serviço, Obra, Obra_Serviço, Funcionário, Alocação, Fornecedor, Compra, Material, Pagamento.
+
+*Item de Orçamento e Item de Compra saíram da lista de entidades (revisão 3): quantidade e valor por serviço/material negociado são atributos do relacionamento N:N Orçamento-Serviço e Compra-Material, não entidades associativas próprias — ver "Justificativa Técnica" abaixo.*
 
 - **Cliente** é quem solicita orçamento e, eventualmente, tem uma obra executada — existe isolado porque pode ter mais de um orçamento/obra ao longo do tempo (histórico).
-- **Orçamento** e **Item de Orçamento** são separados porque um orçamento tem vários serviços orçados, cada um com sua própria quantidade e valor negociado — não caberia num único registro.
+- **Orçamento** relaciona-se N:N com **Serviço**: um orçamento tem vários serviços orçados, cada um com sua própria quantidade e valor negociado — atributos que ficam no próprio relacionamento, não numa entidade separada.
 - **Serviço** é um catálogo reutilizável: o mesmo serviço (ex.: "pintura interna") aparece em vários orçamentos diferentes, com valor de referência único, mas negociado item a item.
 - **Obra** nasce de um orçamento aprovado e é o eixo em torno do qual giram equipe, compras e pagamentos daquele projeto específico.
-- **Obra_Serviço** existe porque o que foi orçado (Item de Orçamento) nem sempre é executado exatamente igual — a obra pode ajustar quantidade e status de execução por serviço.
+- **Obra_Serviço** existe porque o que foi orçado nem sempre é executado exatamente igual — a obra pode ajustar quantidade e status de execução por serviço.
 - **Funcionário** e **Alocação** são separados pelo mesmo motivo de Cliente/Obra: um funcionário atua em várias obras ao longo do tempo, cada alocação com sua função e período específicos naquela obra.
-- **Fornecedor**, **Compra**, **Item de Compra** e **Material** seguem a mesma lógica do bloco de orçamento: Material é catálogo reutilizável, Compra é o pedido feito a um Fornecedor para uma Obra, Item de Compra detalha quantidade/valor de cada material naquela compra.
+- **Fornecedor**, **Compra** e **Material** seguem a mesma lógica do bloco de orçamento: Material é catálogo reutilizável, Compra é o pedido feito a um Fornecedor (para uma Obra ou para estoque geral), e quantidade/valor de cada material naquela compra fica no relacionamento Compra-Material.
 - **Pagamento** é separado da Obra porque uma obra é paga em várias etapas, cada uma com sua própria data, valor e status.
 
 **Relacionamentos pertinentes:**
 
 - Um Cliente possui vários Orçamentos e várias Obras; um Orçamento/Obra pertence a um único Cliente.
-- Um Orçamento possui vários Itens de Orçamento; cada Item de Orçamento refere-se a um único Serviço do catálogo.
+- Um Orçamento reúne vários Serviços do catálogo (N:N), com quantidade e valor negociado no próprio relacionamento; um Serviço pode aparecer em vários orçamentos.
 - Um Orçamento aprovado origina, no máximo, uma Obra (nem todo Orçamento vira Obra — só o que for aprovado); toda Obra tem exatamente um Orçamento de origem.
 - Uma Obra executa vários Serviços (via Obra_Serviço); um Serviço pode estar em várias obras.
 - Uma Obra recebe várias Alocações; cada Alocação vincula um único Funcionário a uma única Obra.
 - Uma Obra pode gerar várias Compras, mas uma Compra nem sempre está ligada a uma Obra — compra para reposição de estoque geral não tem obra de destino; toda Compra é feita a um único Fornecedor.
-- Uma Compra possui vários Itens de Compra; cada Item de Compra refere-se a um único Material do catálogo.
+- Uma Compra reúne vários Materiais do catálogo (N:N), com quantidade e valor pago no próprio relacionamento; um Material pode aparecer em várias compras.
 - Uma Obra recebe vários Pagamentos (um por etapa).
 
 **Restrições e políticas organizacionais aplicadas ao modelo:**
 - Uma Obra só existe vinculada a um Orçamento aprovado — não há Obra sem Orçamento de origem.
-- O valor total de um Orçamento e de uma Compra são sempre derivados da soma dos seus itens, nunca digitados diretamente — o que reforça Item_Orçamento e Item_Compra como o nível de detalhe real do dado.
+- O valor total de um Orçamento e de uma Compra são sempre derivados da soma dos itens do relacionamento (quantidade × valor_unitario de cada Serviço/Material), nunca digitados diretamente.
 
 ---
 
@@ -664,17 +660,19 @@ Especificações:
 
 ![DER - JG Construções](DER.png)
 
-13 entidades, com as cardinalidades de cada relacionamento: Cliente 1:N Orçamento; Cliente 1:N Obra; Orçamento 1:N Item_Orçamento; Orçamento 1:0,1 Obra (todo Orçamento aprovado gera no máximo uma Obra; toda Obra vem de exatamente um Orçamento); Serviço 1:N Item_Orçamento e 1:N Obra_Serviço; Obra 1:N Obra_Serviço, 1:N Alocação, 1:N Pagamento; Obra 0,1:N Compra (compra pode não ter obra — estoque geral); Funcionário 1:N Alocação; Fornecedor 1:N Compra; Compra 1:N Item_Compra; Material 1:N Item_Compra.
+11 entidades, com as cardinalidades de cada relacionamento: Cliente 1:N Orçamento; Cliente 1:N Obra; Orçamento N:N Serviço (com quantidade/valor no relacionamento); Orçamento 1:0,1 Obra (todo Orçamento aprovado gera no máximo uma Obra; toda Obra vem de exatamente um Orçamento); Serviço 1:N Obra_Serviço; Obra 1:N Obra_Serviço, 1:N Alocação, 1:N Pagamento; Obra 0,1:N Compra (compra pode não ter obra — estoque geral); Funcionário 1:N Alocação; Fornecedor 1:N Compra; Compra N:N Material (com quantidade/valor no relacionamento).
 
-*(Revisão 2: durante a conferência do modelo, percebemos duas inconsistências na primeira versão do diagrama — a relação Orçamento→Obra estava desenhada como 1:N, quando pela própria regra de negócio uma Obra só pode vir de UM Orçamento aprovado, e havia uma ligação direta entre Compra e Material que duplicava o que o Item_Compra já resolve. As duas foram corrigidas nesta versão do `DER.png`.)*
+*(Revisão 2: durante a conferência do modelo, percebemos duas inconsistências na primeira versão do diagrama — a relação Orçamento→Obra estava desenhada como 1:N, quando pela própria regra de negócio uma Obra só pode vir de UM Orçamento aprovado, e havia uma ligação direta entre Compra e Material que duplicava o que o Item_Compra já resolvia. As duas foram corrigidas.)*
+
+*(Revisão 3: Item_Orçamento e Item_Compra saíram como entidades associativas próprias. Notação de Chen correta pra um N:N com atributo (quantidade, valor_unitario, valor_item) é o atributo pendurado no PRÓPRIO losango do relacionamento, não uma entidade nova com dois losangos grudados nela — o erro anterior tinha, na prática, dois relacionamentos saindo da mesma caixa, o que não é uma leitura válida do diagrama. A tabela física (junção com essas colunas) continua existindo do mesmo jeito; o que mudou foi só a representação conceitual.)*
 
 ---
 
 ### Justificativa Técnica
 
-A decisão central do modelo foi **separar o que foi orçado (Item_Orçamento) do que foi de fato executado (Obra_Serviço)**, em vez de assumir que a obra sempre executa exatamente o que constava no orçamento. Na prática de uma obra, quantidade e escopo de um serviço podem mudar no meio do caminho (mais metros quadrados do que o previsto, um serviço cancelado). Um único registro que misturasse "orçado" e "executado" perderia essa diferença — e é justamente essa diferença que a empresa precisa para saber se está ganhando ou perdendo dinheiro numa obra em relação ao que foi vendido ao cliente.
+A decisão central do modelo foi **separar o que foi orçado (relacionamento Orçamento-Serviço) do que foi de fato executado (Obra_Serviço)**, em vez de assumir que a obra sempre executa exatamente o que constava no orçamento. Na prática de uma obra, quantidade e escopo de um serviço podem mudar no meio do caminho (mais metros quadrados do que o previsto, um serviço cancelado). Um único registro que misturasse "orçado" e "executado" perderia essa diferença — e é justamente essa diferença que a empresa precisa para saber se está ganhando ou perdendo dinheiro numa obra em relação ao que foi vendido ao cliente.
 
-A segunda decisão foi **tratar Serviço e Material como catálogos**, separados de Item_Orçamento/Item_Compra. Isso evita redigitar "Pintura interna — R$ 35/m²" a cada novo orçamento, mas também permite que o valor efetivamente cobrado (no Item_Orçamento) seja diferente do valor de referência do catálogo — refletindo a regra de negócio real de que todo orçamento é, até certo ponto, negociado com o cliente.
+A segunda decisão foi **tratar Serviço e Material como catálogos**, com valor de referência próprio, independente do que é negociado em cada orçamento/compra. Isso evita redigitar "Pintura interna — R$ 35/m²" a cada novo orçamento, mas também permite que o valor efetivamente cobrado (atributo do relacionamento Orçamento-Serviço) seja diferente do valor de referência do catálogo — refletindo a regra de negócio real de que todo orçamento é, até certo ponto, negociado com o cliente. Quantidade e valor por serviço/material negociado não viraram uma entidade associativa própria (Item_Orçamento/Item_Compra, como numa versão anterior deste DER) porque são atributos do PRÓPRIO relacionamento N:N — colocá-los numa entidade à parte, ligada por dois losangos, não é uma leitura válida de um diagrama de Chen (um relacionamento não se liga a outro relacionamento; ele se liga a entidades).
 
 Por fim, **Pagamento foi modelado por etapa, vinculado à Obra**, e não como um valor único fechado no momento da venda — porque obra de reforma tipicamente não é paga de uma vez só; separar por etapa é o que permite ao sistema responder "quanto já foi pago dessa obra" e "quanto ainda falta receber" a qualquer momento, sem depender de conferência manual.
 
@@ -706,6 +704,32 @@ Por fim, **Pagamento foi modelado por etapa, vinculado à Obra**, e não como um
 | **Trechos rejeitados ou corrigidos** | A sugestão inicial de remover o campo id_cliente de Obra foi revista depois de cruzar com o dicionário de dados já escrito pelo grupo, que tratava esse campo como obrigatório de propósito — o grupo optou por manter e simplesmente não reintroduzir esse "erro" como correção. |
 | **Justificativa da escolha final** | Optamos por manter as correções de cardinalidade (Orçamento-Obra e Compra-Material) porque essas sim contrariavam a regra de negócio escrita pelo próprio grupo, sem ambiguidade. A conclusão e as referências foram revisadas por nós antes de manter, ajustando trechos que pareciam genéricos demais para refletir o que realmente aconteceu no nosso processo. |
 | **Reflexão crítica** | Ficou claro que a IA lendo só a imagem do diagrama teria "corrigido" um campo que na verdade era intencional — só cruzando com o texto que o próprio grupo escreveu foi possível perceber isso. Reforça que revisão de IA sobre modelagem de dados precisa sempre ser cruzada com as regras de negócio documentadas, não só com o desenho. |
+
+**Terceira rodada — conversão de notação (Crow's Foot para Chen/MER brasileiro)**
+
+| Item | O que registrar |
+|------|------------------|
+| **Ferramenta e etapa** | Claude (Anthropic), usado pra redesenhar o DER trocando a notação de "pé de galinha" (Crow's Foot) pela notação de Chen usada no material da disciplina — entidades em caixa, relacionamento em losango com verbo, cardinalidade numérica (min,max) junto de cada ponta. |
+| **Motivação** | O grupo pediu a troca de notação pra bater com o que foi ensinado em aula. |
+| **Prompt(s) utilizados** | Pedimos pra converter o diagrama existente pra notação de Chen/MER brasileiro, mantendo as entidades, atributos e cardinalidades já revisadas na segunda rodada. |
+| **Resposta recebida** | Diagrama redesenhado do zero (SVG gerado por script) com caixas coloridas por entidade, losango de relacionamento com verbo e cardinalidade (min,max) nas duas pontas. |
+| **Fontes consultadas e verificadas** | O próprio DER já revisado na segunda rodada — a troca foi só de notação visual, sem mudar entidade/atributo/cardinalidade nenhuma. |
+| **Trechos rejeitados ou corrigidos** | Nenhum nesta rodada. |
+| **Justificativa da escolha final** | Notação exigida pela disciplina. |
+| **Reflexão crítica** | Essa rodada não mexeu no CONTEÚDO do modelo, só na representação — mas foi justamente nela que entrou, sem o grupo perceber na hora, o erro que a quarta rodada corrigiu abaixo (duas entidades associativas ligadas por dois losangos cada). Mudar de notação é um bom momento pra reintroduzir erro de modelagem sem querer, porque a atenção vai toda pro desenho, não pra estrutura. |
+
+**Quarta rodada — remoção de Item_Orçamento e Item_Compra como entidades**
+
+| Item | O que registrar |
+|------|------------------|
+| **Ferramenta e etapa** | Claude (Anthropic), usado pra corrigir um erro estrutural apontado pelo grupo: Item_Orçamento e Item_Compra apareciam como entidade associativa própria, cada uma ligada por DOIS losangos (um pra cada lado do N:N que ela resolvia) — leitura inválida de um diagrama de Chen, onde um relacionamento se liga a entidades, não a outro relacionamento. |
+| **Motivação** | O grupo identificou o problema sozinho ("não pode ter dois losangos ligados neles mesmo") e pediu a correção, incluindo remover as chaves estrangeiras das entidades removidas. |
+| **Prompt(s) utilizados** | Pedimos pra remover Item de Compra, a chave estrangeira associada, Item de Orçamento, e os losangos duplicados, e "fazer direito". |
+| **Resposta recebida** | Item_Orçamento e Item_Compra saíram como entidade; quantidade/valor_unitario/valor_item viraram atributos pendurados no PRÓPRIO relacionamento N:N (Orçamento-Serviço e Compra-Material), um losango só por relacionamento, notação de Chen correta pra atributo-de-relacionamento (elipse presa ao losango). Dicionário de dados, lista de relacionamentos e texto de justificativa técnica atualizados pra não citar mais as duas entidades como tabela própria. |
+| **Fontes consultadas e verificadas** | O próprio DER e o texto de "Justificativa Técnica" já escritos neste README, pra manter coerentes a razão de existir de Serviço/Material como catálogo (que continua válida) sem depender mais da entidade associativa removida. |
+| **Trechos rejeitados ou corrigidos** | Nenhum — a correção pedida pelo grupo estava tecnicamente certa (é, de fato, um erro clássico de notação de Chen confundir "entidade associativa" com "atributo de relacionamento"). |
+| **Justificativa da escolha final** | Aceita integralmente: um relacionamento N:N com atributo simples (sem vida própria, sem ser referenciado por mais nenhuma outra entidade) é caso de atributo-no-losango, não de nova entidade — a própria bibliografia da disciplina (Heuser, Elmasri/Navathe) trata esse padrão dessa forma. |
+| **Reflexão crítica** | Esse foi o segundo erro de modelagem encontrado pelo próprio grupo, não pela IA — reforça que a revisão humana continua sendo a que efetivamente pega os erros conceituais; a IA aqui executou a correção depois de identificado o problema, não identificou sozinha. |
 
 ## Conclusão
 
