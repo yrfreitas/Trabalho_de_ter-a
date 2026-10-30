@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Dicionário de Dados - JG Construções</title>
+    <title>Dicionário de Dados Lógico - JG Construções</title>
 
     <style>
 
@@ -131,6 +131,72 @@
 
         }
 
+    
+        td.mono, th.mono {
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 13px;
+        }
+
+        td.mono {
+            white-space: nowrap;
+        }
+
+        td.chave {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        h2.bloco {
+            margin: 50px 0 20px 0;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #222;
+        }
+
+        h3.sub {
+            margin: 25px 0 10px 0;
+        }
+
+        p.texto {
+            margin: 0 0 15px 0;
+            line-height: 1.5;
+        }
+
+        nav.sumario {
+            background: #f4f4f4;
+            border-radius: 8px;
+            padding: 18px 28px;
+            margin-bottom: 40px;
+        }
+
+        nav.sumario ol {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        nav.sumario a {
+            color: #222;
+        }
+
+        pre {
+            background: #222;
+            color: #f1f1f1;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .aviso {
+            background: #fff8e1;
+            border-left: 4px solid #f0b400;
+            padding: 12px 16px;
+            margin: 15px 0 25px 0;
+            border-radius: 4px;
+            line-height: 1.5;
+        }
+
     </style>
 
 </head>
@@ -139,895 +205,2032 @@
 
 <div class="container">
 
-    <h1>Dicionário de Dados Conceitual (Preliminar)</h1>
+    <h1>Dicionário de Dados Lógico</h1>
 
     <p class="subtitulo">
-        Sistema de Gestão de Informações — JG Construções LTDA
+        Sistema de Gestão de Obras e Serviços — JG Construções LTDA
     </p>
 
+    <nav class="sumario">
+        <strong>Sumário</strong>
+        <ol>
+            <li><a href="#convencoes">Convenções e padrões</a></li>
+            <li><a href="#entidades">Entidades (tabelas do DER)</a></li>
+            <li><a href="#relacionamentos">Relacionamentos: cardinalidades e definições</a></li>
+            <li><a href="#indices">Índices</a></li>
+            <li><a href="#fluxo">Fluxo de dados</a></li>
+            <li><a href="#log">Log de auditoria</a></li>
+            <li><a href="#lgpd">LGPD</a></li>
+        </ol>
+    </nav>
 
-    <!-- ========================= -->
-    <!-- CLIENTE -->
-    <!-- ========================= -->
+    <h2 class="bloco" id="convencoes">1. Convenções e padrões</h2>
 
-    <section class="entidade">
+    <p class="texto">Padrões adotados em todo o modelo. Os nomes das tabelas e colunas seguem exatamente o DER; as restrições SQL foram escritas para MySQL 8.0 e testadas também em MariaDB 10.11.</p>
 
-        <h2>Entidade: Cliente</h2>
+    <section class="entidade relacionamento">
+
+        <h2>Convenções gerais</h2>
 
         <div class="tabela">
-
             <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Definição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="chave">SGBD alvo</td>
+                        <td>MySQL 8.0 ou superior (script também validado em MariaDB 10.11)</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Banco de dados</td>
+                        <td>jg_construcoes</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Engine</td>
+                        <td>InnoDB (suporte a transações e chaves estrangeiras)</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Conjunto de caracteres (charset)</td>
+                        <td>utf8mb4</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Collation</td>
+                        <td>utf8mb4_unicode_ci (comparação sem diferenciar maiúsculas/minúsculas e acentos)</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Notação do modelo</td>
+                        <td>Modelo lógico relacional: tabelas com colunas tipadas, PK (chave primária), FK (chave estrangeira) e UQ (valor único)</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Notação de cardinalidade</td>
+                        <td>1:N (um para muitos), lida do lado pai para o lado filho; a participação de cada lado é detalhada na seção 3</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Notação de tipos</td>
+                        <td>tipo(tamanho) conforme o DER, por exemplo varchar(100) e decimal(10,2)</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Nomes de tabelas</td>
+                        <td>minúsculas, singular, sem acentos e sem espaços: cliente, obra, servico, orcamento, eletrica, hidraulica</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Nomes de colunas</td>
+                        <td>minúsculas, snake_case, sem acentos: data_cadastro, forma_pagamento</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Prefixo id_</td>
+                        <td>Chave primária: id_&lt;tabela&gt;. A chave estrangeira mantém o mesmo nome da chave que referencia (id_obra em funcionario referencia obra.id_obra)</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Prefixo data_</td>
+                        <td>Colunas do tipo date: data_inicio, data_fim, data_emissao, data_pagamento</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Prefixo pk_</td>
+                        <td>Constraint de chave primária: pk_&lt;tabela&gt;</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Prefixo fk_</td>
+                        <td>Constraint de chave estrangeira: fk_&lt;tabela_filha&gt;_&lt;tabela_pai&gt;</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Prefixo uq_</td>
+                        <td>Constraint e índice de valor único: uq_&lt;tabela&gt;_&lt;coluna&gt;</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Prefixo idx_</td>
+                        <td>Índice comum: idx_&lt;tabela&gt;_&lt;coluna&gt;</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Prefixo ck_</td>
+                        <td>Constraint de verificação (CHECK): ck_&lt;tabela&gt;_&lt;regra&gt;</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Prefixo trg_</td>
+                        <td>Trigger: trg_&lt;tabela&gt;_&lt;ai|au|ad&gt;, onde ai = after insert, au = after update, ad = after delete</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Valores de status</td>
+                        <td>Texto em minúsculas e sem acentos, validados por CHECK (ex.: concluida, e não concluída)</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Formato de datas</td>
+                        <td>date no padrão AAAA-MM-DD; datetime no padrão AAAA-MM-DD HH:MM:SS</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Integridade referencial</td>
+                        <td>Todas as FKs usam ON DELETE RESTRICT e ON UPDATE CASCADE (detalhes na seção 3)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
+    </section>
+
+    <section class="entidade relacionamento">
+
+        <h2>Legenda de chaves e restrições</h2>
+
+        <div class="tabela">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sigla / expressão</th>
+                        <th>Significado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="mono">PK</td>
+                        <td>Primary Key: chave primária; identifica a linha de forma única e nunca é nula</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">FK</td>
+                        <td>Foreign Key: chave estrangeira; o valor precisa existir na chave da tabela referenciada</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">UQ</td>
+                        <td>Unique: o valor não pode se repetir em outra linha da mesma tabela</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">NOT NULL / NULL</td>
+                        <td>Preenchimento obrigatório / preenchimento opcional</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">AUTO_INCREMENT</td>
+                        <td>Valor numérico gerado automaticamente pelo banco (ícone &quot;+&quot; nas chaves primárias do DER)</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">DEFAULT</td>
+                        <td>Valor assumido quando nenhum é informado no INSERT</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">CHECK (expressão)</td>
+                        <td>Condição lógica que toda linha precisa satisfazer; se for falsa, o banco rejeita a gravação</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <h2 class="bloco" id="entidades">2. Entidades (tabelas do DER)</h2>
+
+    <p class="texto">Uma tabela por entidade do DER, com tipo, chave, expressão formal de restrições e regra de negócio de cada atributo.</p>
+
+    <section class="entidade" id="tb-cliente">
+
+        <h2>Entidade: Cliente (tabela cliente)</h2>
+
+        <div class="tabela">
+            <table>
                 <thead>
                     <tr>
                         <th>Atributo</th>
+                        <th>Tipo</th>
+                        <th>Chave</th>
+                        <th>Restrições (SQL)</th>
                         <th>Descrição</th>
                         <th>Regra de negócio associada</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                     <tr>
-                        <td>id_cliente</td>
+                        <td class="mono">id_cliente</td>
+                        <td class="mono">int</td>
+                        <td class="chave">PK</td>
+                        <td class="mono">PRIMARY KEY; AUTO_INCREMENT; NOT NULL</td>
                         <td>Identificador único do cliente</td>
-                        <td>Obrigatório, gerado pelo sistema</td>
+                        <td>Obrigatório; gerado pelo sistema (auto incremento)</td>
                     </tr>
-
                     <tr>
-                        <td>nome</td>
+                        <td class="mono">nome</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
                         <td>Nome completo ou razão social</td>
                         <td>Obrigatório</td>
                     </tr>
-
                     <tr>
-                        <td>tipo_pessoa</td>
-                        <td>Pessoa física ou jurídica</td>
-                        <td>Obrigatório; define se usa CPF ou CNPJ</td>
+                        <td class="mono">cpf_cnpj</td>
+                        <td class="mono">varchar(18)</td>
+                        <td class="chave">UQ</td>
+                        <td class="mono">NOT NULL; UNIQUE; CHECK (CHAR_LENGTH(cpf_cnpj) &gt;= 11)</td>
+                        <td>CPF ou CNPJ do cliente (com ou sem máscara)</td>
+                        <td>Obrigatório; único; mínimo de 11 caracteres</td>
                     </tr>
-
                     <tr>
-                        <td>cpf_cnpj</td>
-                        <td>Documento de identificação</td>
-                        <td>Obrigatório, único</td>
-                    </tr>
-
-                    <tr>
-                        <td>telefone</td>
-                        <td>Telefone de contato</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>email</td>
+                        <td class="mono">email</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NULL</td>
                         <td>E-mail de contato</td>
                         <td>Opcional</td>
                     </tr>
-
                     <tr>
-                        <td>endereço</td>
+                        <td class="mono">telefone</td>
+                        <td class="mono">varchar(20)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Telefone de contato</td>
+                        <td>Obrigatório</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">endereco</td>
+                        <td class="mono">varchar(200)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NULL</td>
                         <td>Endereço do cliente</td>
                         <td>Opcional</td>
                     </tr>
-
                     <tr>
-                        <td>data_cadastro</td>
+                        <td class="mono">data_cadastro</td>
+                        <td class="mono">date</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL; DEFAULT (CURRENT_DATE)</td>
                         <td>Data em que o cliente foi cadastrado</td>
-                        <td>Obrigatório, gerado pelo sistema</td>
+                        <td>Obrigatório; preenchido pelo sistema com a data atual</td>
                     </tr>
-
                 </tbody>
-
             </table>
-
         </div>
 
     </section>
 
+    <section class="entidade" id="tb-obra">
 
-    <!-- ========================= -->
-    <!-- OBRA -->
-    <!-- ========================= -->
-
-    <section class="entidade">
-
-        <h2>Entidade: Obra</h2>
+        <h2>Entidade: Obra (tabela obra)</h2>
 
         <div class="tabela">
-
             <table>
-
                 <thead>
                     <tr>
                         <th>Atributo</th>
+                        <th>Tipo</th>
+                        <th>Chave</th>
+                        <th>Restrições (SQL)</th>
                         <th>Descrição</th>
                         <th>Regra de negócio associada</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                     <tr>
-                        <td>id_obra</td>
+                        <td class="mono">id_obra</td>
+                        <td class="mono">int</td>
+                        <td class="chave">PK</td>
+                        <td class="mono">PRIMARY KEY; AUTO_INCREMENT; NOT NULL</td>
                         <td>Identificador único da obra</td>
-                        <td>Obrigatório</td>
+                        <td>Obrigatório; gerado pelo sistema (auto incremento)</td>
                     </tr>
-
                     <tr>
-                        <td>endereço_obra</td>
+                        <td class="mono">id_cliente</td>
+                        <td class="mono">int</td>
+                        <td class="chave">FK</td>
+                        <td class="mono">NOT NULL; FOREIGN KEY → cliente.id_cliente</td>
+                        <td>Cliente dono da obra</td>
+                        <td>Obrigatório; deve existir em cliente.id_cliente</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">endereco</td>
+                        <td class="mono">varchar(200)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
                         <td>Local onde a obra será executada</td>
                         <td>Obrigatório</td>
                     </tr>
-
                     <tr>
-                        <td>id_cliente</td>
-                        <td>Cliente responsável pela obra</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>id_orcamento</td>
-                        <td>Orçamento aprovado que originou a obra</td>
-                        <td>Obrigatório — obra só é criada a partir de um orçamento aprovado</td>
-                    </tr>
-
-                    <tr>
-                        <td>descricao_escopo</td>
-                        <td>Resumo do escopo da obra</td>
+                        <td class="mono">responsavel_cliente</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NULL</td>
+                        <td>Pessoa indicada pelo cliente como responsável/contato no local da obra</td>
                         <td>Opcional</td>
                     </tr>
-
                     <tr>
-                        <td>data_inicio</td>
+                        <td class="mono">tipo_servico</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Tipo de serviço principal da obra (ex.: pintura, elétrica, hidráulica, acabamento)</td>
+                        <td>Obrigatório</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">data_inicio</td>
+                        <td class="mono">date</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
                         <td>Data de início prevista/real</td>
                         <td>Obrigatório</td>
                     </tr>
-
                     <tr>
-                        <td>data_fim</td>
+                        <td class="mono">data_fim</td>
+                        <td class="mono">date</td>
+                        <td class="chave"></td>
+                        <td class="mono">NULL; CHECK (data_fim IS NULL OR data_fim &gt;= data_inicio)</td>
                         <td>Data de conclusão prevista/real</td>
-                        <td>Opcional até conclusão</td>
+                        <td>Opcional até a conclusão; não pode ser anterior a data_inicio</td>
                     </tr>
-
                     <tr>
-                        <td>status</td>
+                        <td class="mono">status</td>
+                        <td class="mono">varchar(20)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL; DEFAULT &#x27;planejada&#x27;; CHECK (status IN (&#x27;planejada&#x27;, &#x27;em andamento&#x27;, &#x27;pausada&#x27;, &#x27;concluida&#x27;))</td>
                         <td>Situação da obra</td>
-                        <td>Deve ser: planejada, em andamento, pausada ou concluída</td>
+                        <td>Obrigatório; valores: planejada, em andamento, pausada ou concluida; inicia como planejada</td>
                     </tr>
-
-                    <tr>
-                        <td>observacoes</td>
-                        <td>Anotações gerais sobre a obra</td>
-                        <td>Opcional</td>
-                    </tr>
-
                 </tbody>
-
             </table>
-
         </div>
 
     </section>
 
+    <section class="entidade" id="tb-servico">
 
-    <!-- ========================= -->
-    <!-- SERVIÇO -->
-    <!-- ========================= -->
+        <h2>Entidade: Serviço (tabela servico)</h2>
 
-    <section class="entidade">
-
-        <h2>Entidade: Serviço</h2>
+        <p class="nota">Catálogo de serviços da empresa. No DER esta entidade não possui chave estrangeira.</p>
 
         <div class="tabela">
-
             <table>
-
                 <thead>
                     <tr>
                         <th>Atributo</th>
+                        <th>Tipo</th>
+                        <th>Chave</th>
+                        <th>Restrições (SQL)</th>
                         <th>Descrição</th>
                         <th>Regra de negócio associada</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                     <tr>
-                        <td>id_servico</td>
+                        <td class="mono">id_servico</td>
+                        <td class="mono">int</td>
+                        <td class="chave">PK</td>
+                        <td class="mono">PRIMARY KEY; AUTO_INCREMENT; NOT NULL</td>
                         <td>Identificador único do serviço</td>
+                        <td>Obrigatório; gerado pelo sistema (auto incremento)</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">descricao</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Nome/descrição do serviço oferecido</td>
                         <td>Obrigatório</td>
                     </tr>
-
                     <tr>
-                        <td>nome_servico</td>
-                        <td>Nome do serviço (ex.: pintura, elétrica)</td>
+                        <td class="mono">tipo</td>
+                        <td class="mono">varchar(50)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Categoria do serviço (ex.: pintura, elétrica, hidráulica, acabamento)</td>
                         <td>Obrigatório</td>
                     </tr>
-
                     <tr>
-                        <td>categoria</td>
-                        <td>Categoria do serviço (ex.: acabamento, instalação, estrutura)</td>
-                        <td>Opcional</td>
+                        <td class="mono">valor_padrao</td>
+                        <td class="mono">decimal(10,2)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NULL; CHECK (valor_padrao IS NULL OR valor_padrao &gt;= 0)</td>
+                        <td>Valor base de referência do serviço</td>
+                        <td>Opcional; não pode ser negativo</td>
                     </tr>
-
                     <tr>
-                        <td>unidade_medida</td>
-                        <td>Unidade de cobrança/medição (ex.: m², hora, unidade)</td>
-                        <td>Obrigatório</td>
+                        <td class="mono">tempo_padrao</td>
+                        <td class="mono">int</td>
+                        <td class="chave"></td>
+                        <td class="mono">NULL; CHECK (tempo_padrao IS NULL OR tempo_padrao &gt; 0)</td>
+                        <td>Tempo padrão de execução do serviço, em horas</td>
+                        <td>Opcional; maior que zero</td>
                     </tr>
-
                     <tr>
-                        <td>descricao</td>
-                        <td>Detalhamento do serviço</td>
-                        <td>Opcional</td>
+                        <td class="mono">tempo_estimado</td>
+                        <td class="mono">int</td>
+                        <td class="chave"></td>
+                        <td class="mono">NULL; CHECK (tempo_estimado IS NULL OR tempo_estimado &gt; 0)</td>
+                        <td>Tempo estimado de execução para o caso concreto, em horas</td>
+                        <td>Opcional; maior que zero</td>
                     </tr>
-
-                    <tr>
-                        <td>valor_referencia</td>
-                        <td>Valor base de referência por unidade</td>
-                        <td>Opcional</td>
-                    </tr>
-
                 </tbody>
-
             </table>
-
         </div>
 
     </section>
 
+    <section class="entidade" id="tb-funcionario">
 
-    <!-- ========================= -->
-    <!-- FUNCIONÁRIO -->
-    <!-- ========================= -->
-
-    <section class="entidade">
-
-        <h2>Entidade: Funcionário/Prestador</h2>
+        <h2>Entidade: Funcionário (tabela funcionario)</h2>
 
         <div class="tabela">
-
             <table>
-
                 <thead>
                     <tr>
                         <th>Atributo</th>
+                        <th>Tipo</th>
+                        <th>Chave</th>
+                        <th>Restrições (SQL)</th>
                         <th>Descrição</th>
                         <th>Regra de negócio associada</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                     <tr>
-                        <td>id_funcionario</td>
-                        <td>Identificador único</td>
+                        <td class="mono">id_funcionario</td>
+                        <td class="mono">int</td>
+                        <td class="chave">PK</td>
+                        <td class="mono">PRIMARY KEY; AUTO_INCREMENT; NOT NULL</td>
+                        <td>Identificador único do funcionário</td>
+                        <td>Obrigatório; gerado pelo sistema (auto incremento)</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">id_obra</td>
+                        <td class="mono">int</td>
+                        <td class="chave">FK</td>
+                        <td class="mono">NOT NULL; FOREIGN KEY → obra.id_obra</td>
+                        <td>Obra em que o funcionário está alocado</td>
+                        <td>Obrigatório; deve existir em obra.id_obra</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">nome</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Nome completo do funcionário</td>
                         <td>Obrigatório</td>
                     </tr>
-
                     <tr>
-                        <td>nome</td>
-                        <td>Nome do profissional</td>
+                        <td class="mono">cpf</td>
+                        <td class="mono">varchar(11)</td>
+                        <td class="chave">UQ</td>
+                        <td class="mono">NOT NULL; UNIQUE; CHECK (cpf REGEXP &#x27;^[0-9]{11}$&#x27;)</td>
+                        <td>CPF do funcionário (somente números)</td>
+                        <td>Obrigatório; único; exatamente 11 dígitos</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">cargo</td>
+                        <td class="mono">varchar(50)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Cargo/função exercida (ex.: pedreiro, eletricista)</td>
                         <td>Obrigatório</td>
                     </tr>
-
                     <tr>
-                        <td>funcao</td>
-                        <td>Função/especialidade (ex.: pedreiro, eletricista)</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>tipo_vinculo</td>
-                        <td>Efetivo ou terceirizado/subcontratado</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>telefone</td>
+                        <td class="mono">telefone</td>
+                        <td class="mono">varchar(20)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NULL</td>
                         <td>Telefone de contato</td>
                         <td>Opcional</td>
                     </tr>
-
                     <tr>
-                        <td>data_inicio_vinculo</td>
-                        <td>Data de início do vínculo com a empresa</td>
-                        <td>Opcional</td>
-                    </tr>
-
-                    <tr>
-                        <td>status_cadastro</td>
-                        <td>Ativo ou inativo</td>
-                        <td>Só pode ser alocado a obras se ativo</td>
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </section>
-
-
-    <!-- ========================= -->
-    <!-- ORÇAMENTO -->
-    <!-- ========================= -->
-
-    <section class="entidade">
-
-        <h2>Entidade: Orçamento</h2>
-
-        <div class="tabela">
-
-            <table>
-
-                <thead>
-                    <tr>
-                        <th>Atributo</th>
-                        <th>Descrição</th>
-                        <th>Regra de negócio associada</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    <tr>
-                        <td>id_orcamento</td>
-                        <td>Identificador único</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>id_cliente</td>
-                        <td>Cliente solicitante</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>data_emissao</td>
-                        <td>Data de emissão do orçamento</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>data_validade</td>
-                        <td>Prazo de validade da proposta</td>
-                        <td>Opcional</td>
-                    </tr>
-
-                    <tr>
-                        <td>valor_total</td>
-                        <td>Valor total orçado</td>
-                        <td>Obrigatório, calculado a partir dos itens do orçamento</td>
-                    </tr>
-
-                    <tr>
-                        <td>status_orcamento</td>
-                        <td>Pendente, aprovado ou recusado</td>
-                        <td>Obra só pode ser aberta se aprovado</td>
-                    </tr>
-
-                    <tr>
-                        <td>observacoes</td>
-                        <td>Condições ou observações da proposta</td>
-                        <td>Opcional</td>
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </section>
-
-
-    <!-- ========================= -->
-    <!-- RELACIONAMENTO ORÇAMENTO-SERVIÇO -->
-    <!-- ========================= -->
-
-    <section class="entidade relacionamento">
-
-        <h2>Relacionamento N:N com Atributos: Orçamento &mdash; compõe &mdash; Serviço</h2>
-
-        <p class="nota">Não é uma entidade própria (revisão do DER corrigiu isso — a versão anterior tinha "Item_Orçamento" ligada por dois losangos, um pro Orçamento e outro pro Serviço, o que não é uma leitura válida de um diagrama de Chen). Quantidade e valor por serviço orçado são atributos do PRÓPRIO relacionamento N:N entre Orçamento e Serviço.</p>
-
-        <div class="tabela">
-
-            <table>
-
-                <thead>
-                    <tr>
-                        <th>Atributo do relacionamento</th>
-                        <th>Descrição</th>
-                        <th>Regra de negócio associada</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    <tr>
-                        <td>quantidade</td>
-                        <td>Quantidade do serviço orçada</td>
-                        <td>Obrigatório, maior que zero</td>
-                    </tr>
-
-                    <tr>
-                        <td>valor_unitario</td>
-                        <td>Valor unitário aplicado no orçamento</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>valor_item</td>
-                        <td>Valor total do item (quantidade × valor_unitario)</td>
-                        <td>Calculado; compõe o valor_total do orçamento</td>
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </section>
-
-
-    <!-- ========================= -->
-    <!-- OBRA SERVIÇO -->
-    <!-- ========================= -->
-
-    <section class="entidade associativa">
-
-        <h2>Entidade Associativa: Obra_Serviço</h2>
-
-        <div class="tabela">
-
-            <table>
-
-                <thead>
-                    <tr>
-                        <th>Atributo</th>
-                        <th>Descrição</th>
-                        <th>Regra de negócio associada</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    <tr>
-                        <td>id_obra_servico</td>
-                        <td>Identificador único do vínculo</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>id_obra</td>
-                        <td>Obra relacionada</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>id_servico</td>
-                        <td>Serviço relacionado</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>quantidade_executada</td>
-                        <td>Quantidade efetivamente executada</td>
-                        <td>Opcional até execução</td>
-                    </tr>
-
-                    <tr>
-                        <td>valor_acordado</td>
-                        <td>Valor acordado para o serviço nessa obra</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>status_execucao</td>
-                        <td>Situação do serviço na obra</td>
-                        <td>Pendente, em execução ou concluído</td>
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </section>
-
-
-    <!-- ========================= -->
-    <!-- PAGAMENTO -->
-    <!-- ========================= -->
-
-    <section class="entidade">
-
-        <h2>Entidade: Pagamento</h2>
-
-        <div class="tabela">
-
-            <table>
-
-                <thead>
-                    <tr>
-                        <th>Atributo</th>
-                        <th>Descrição</th>
-                        <th>Regra de negócio associada</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    <tr>
-                        <td>id_pagamento</td>
-                        <td>Identificador único</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>id_obra</td>
-                        <td>Obra relacionada</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>numero_etapa</td>
-                        <td>Etapa/parcela a que o pagamento se refere</td>
-                        <td>Opcional</td>
-                    </tr>
-
-                    <tr>
-                        <td>valor</td>
-                        <td>Valor pago</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>data_pagamento</td>
-                        <td>Data do pagamento</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>forma_pagamento</td>
-                        <td>Ex.: PIX, boleto, transferência</td>
-                        <td>Opcional</td>
-                    </tr>
-
-                    <tr>
-                        <td>status_pagamento</td>
-                        <td>Pago, pendente ou atrasado</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </section>
-
-
-    <!-- ========================= -->
-    <!-- ALOCAÇÃO -->
-    <!-- ========================= -->
-
-    <section class="entidade associativa">
-
-        <h2>Entidade Associativa: Alocação</h2>
-
-        <div class="tabela">
-
-            <table>
-
-                <thead>
-                    <tr>
-                        <th>Atributo</th>
-                        <th>Descrição</th>
-                        <th>Regra de negócio associada</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    <tr>
-                        <td>id_alocacao</td>
-                        <td>Identificador único da alocação</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>id_obra</td>
-                        <td>Obra em que o profissional atua</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>id_funcionario</td>
-                        <td>Profissional alocado</td>
-                        <td>Obrigatório; só pode ser alocado se status_cadastro = ativo</td>
-                    </tr>
-
-                    <tr>
-                        <td>funcao_na_obra</td>
-                        <td>Função exercida especificamente nessa obra</td>
-                        <td>Opcional</td>
-                    </tr>
-
-                    <tr>
-                        <td>data_inicio_alocacao</td>
-                        <td>Data de início da alocação na obra</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>data_fim_alocacao</td>
-                        <td>Data de término da alocação na obra</td>
-                        <td>Opcional até desligamento da obra</td>
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </section>
-
-
-    <!-- ========================= -->
-    <!-- FORNECEDOR -->
-    <!-- ========================= -->
-
-    <section class="entidade">
-
-        <h2>Entidade: Fornecedor</h2>
-
-        <div class="tabela">
-
-            <table>
-
-                <thead>
-                    <tr>
-                        <th>Atributo</th>
-                        <th>Descrição</th>
-                        <th>Regra de negócio associada</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    <tr>
-                        <td>id_fornecedor</td>
-                        <td>Identificador único do fornecedor</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>nome_fornecedor</td>
-                        <td>Nome/razão social do fornecedor</td>
-                        <td>Obrigatório</td>
-                    </tr>
-
-                    <tr>
-                        <td>cnpj</td>
-                        <td>Documento de identificação</td>
-                        <td>Opcional</td>
-                    </tr>
-
-                    <tr>
-                        <td>telefone</td>
-                        <td>Telefone de contato</td>
-                        <td>Opcional</td>
-                    </tr>
-
-                    <tr>
-                        <td>email</td>
+                        <td class="mono">email</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NULL</td>
                         <td>E-mail de contato</td>
                         <td>Opcional</td>
                     </tr>
-
                     <tr>
-                        <td>endereço</td>
-                        <td>Endereço do fornecedor</td>
-                        <td>Opcional</td>
+                        <td class="mono">data_admissao</td>
+                        <td class="mono">date</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Data de admissão na empresa</td>
+                        <td>Obrigatório</td>
                     </tr>
-
+                    <tr>
+                        <td class="mono">status</td>
+                        <td class="mono">varchar(20)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL; DEFAULT &#x27;ativo&#x27;; CHECK (status IN (&#x27;ativo&#x27;, &#x27;inativo&#x27;))</td>
+                        <td>Situação do cadastro (ativo ou inativo)</td>
+                        <td>Obrigatório; só pode ser alocado a uma obra se estiver ativo (regra da aplicação)</td>
+                    </tr>
                 </tbody>
-
             </table>
-
         </div>
 
     </section>
 
+    <section class="entidade" id="tb-prestador">
 
-    <!-- ========================= -->
-    <!-- MATERIAL -->
-    <!-- ========================= -->
+        <h2>Entidade: Prestador (tabela prestador)</h2>
 
-    <section class="entidade">
-
-        <h2>Entidade: Material</h2>
+        <p class="nota">Profissional terceirizado/autônomo, sem vínculo empregatício com a empresa.</p>
 
         <div class="tabela">
-
             <table>
-
                 <thead>
                     <tr>
                         <th>Atributo</th>
+                        <th>Tipo</th>
+                        <th>Chave</th>
+                        <th>Restrições (SQL)</th>
                         <th>Descrição</th>
                         <th>Regra de negócio associada</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                     <tr>
-                        <td>id_material</td>
-                        <td>Identificador único do material</td>
+                        <td class="mono">id_prestador</td>
+                        <td class="mono">int</td>
+                        <td class="chave">PK</td>
+                        <td class="mono">PRIMARY KEY; AUTO_INCREMENT; NOT NULL</td>
+                        <td>Identificador único do prestador de serviço</td>
+                        <td>Obrigatório; gerado pelo sistema (auto incremento)</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">id_obra</td>
+                        <td class="mono">int</td>
+                        <td class="chave">FK</td>
+                        <td class="mono">NOT NULL; FOREIGN KEY → obra.id_obra</td>
+                        <td>Obra em que o prestador atua</td>
+                        <td>Obrigatório; deve existir em obra.id_obra</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">nome</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Nome completo do prestador</td>
                         <td>Obrigatório</td>
                     </tr>
-
                     <tr>
-                        <td>nome_material</td>
+                        <td class="mono">cpf</td>
+                        <td class="mono">varchar(11)</td>
+                        <td class="chave">UQ</td>
+                        <td class="mono">NOT NULL; UNIQUE; CHECK (cpf REGEXP &#x27;^[0-9]{11}$&#x27;)</td>
+                        <td>CPF do prestador (somente números)</td>
+                        <td>Obrigatório; único; exatamente 11 dígitos</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">especialidade</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Especialidade do prestador (ex.: pintor, eletricista, encanador)</td>
+                        <td>Obrigatório</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">telefone</td>
+                        <td class="mono">varchar(20)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NULL</td>
+                        <td>Telefone de contato</td>
+                        <td>Opcional</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">email</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NULL</td>
+                        <td>E-mail de contato</td>
+                        <td>Opcional</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <section class="entidade" id="tb-orcamento">
+
+        <h2>Entidade: Orçamento (tabela orcamento)</h2>
+
+        <div class="tabela">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Tipo</th>
+                        <th>Chave</th>
+                        <th>Restrições (SQL)</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="mono">id_orcamento</td>
+                        <td class="mono">int</td>
+                        <td class="chave">PK</td>
+                        <td class="mono">PRIMARY KEY; AUTO_INCREMENT; NOT NULL</td>
+                        <td>Identificador único do orçamento</td>
+                        <td>Obrigatório; gerado pelo sistema (auto incremento)</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">id_obra</td>
+                        <td class="mono">int</td>
+                        <td class="chave">FK</td>
+                        <td class="mono">NOT NULL; FOREIGN KEY → obra.id_obra</td>
+                        <td>Obra a que o orçamento se refere</td>
+                        <td>Obrigatório; deve existir em obra.id_obra</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">id_cliente</td>
+                        <td class="mono">int</td>
+                        <td class="chave">FK</td>
+                        <td class="mono">NOT NULL; FOREIGN KEY → cliente.id_cliente</td>
+                        <td>Cliente solicitante do orçamento</td>
+                        <td>Obrigatório; deve existir em cliente.id_cliente</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">valor_total</td>
+                        <td class="mono">decimal(10,2)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL; CHECK (valor_total &gt;= 0)</td>
+                        <td>Valor total orçado</td>
+                        <td>Obrigatório; não pode ser negativo</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">data_emissao</td>
+                        <td class="mono">date</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL; DEFAULT (CURRENT_DATE)</td>
+                        <td>Data de emissão do orçamento</td>
+                        <td>Obrigatório; preenchido com a data atual se não informado</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">status</td>
+                        <td class="mono">varchar(20)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL; DEFAULT &#x27;pendente&#x27;; CHECK (status IN (&#x27;pendente&#x27;, &#x27;aprovado&#x27;, &#x27;recusado&#x27;))</td>
+                        <td>Situação do orçamento</td>
+                        <td>Obrigatório; valores: pendente, aprovado ou recusado; inicia como pendente</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <section class="entidade" id="tb-pagamento">
+
+        <h2>Entidade: Pagamento (tabela pagamento)</h2>
+
+        <div class="tabela">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Tipo</th>
+                        <th>Chave</th>
+                        <th>Restrições (SQL)</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="mono">id_pagamento</td>
+                        <td class="mono">int</td>
+                        <td class="chave">PK</td>
+                        <td class="mono">PRIMARY KEY; AUTO_INCREMENT; NOT NULL</td>
+                        <td>Identificador único do pagamento</td>
+                        <td>Obrigatório; gerado pelo sistema (auto incremento)</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">id_orcamento</td>
+                        <td class="mono">int</td>
+                        <td class="chave">FK</td>
+                        <td class="mono">NOT NULL; FOREIGN KEY → orcamento.id_orcamento</td>
+                        <td>Orçamento ao qual o pagamento se refere</td>
+                        <td>Obrigatório; deve existir em orcamento.id_orcamento</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">forma_pagamento</td>
+                        <td class="mono">varchar(50)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NULL</td>
+                        <td>Forma de pagamento (ex.: PIX, boleto, transferência, cartão)</td>
+                        <td>Opcional</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">valor</td>
+                        <td class="mono">decimal(10,2)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL; CHECK (valor &gt; 0)</td>
+                        <td>Valor do pagamento</td>
+                        <td>Obrigatório; maior que zero</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">data_pagamento</td>
+                        <td class="mono">date</td>
+                        <td class="chave"></td>
+                        <td class="mono">NULL; CHECK (status &lt;&gt; &#x27;pago&#x27; OR data_pagamento IS NOT NULL)</td>
+                        <td>Data em que o pagamento foi efetuado</td>
+                        <td>Opcional enquanto pendente/atrasado; obrigatória quando status = pago</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">status</td>
+                        <td class="mono">varchar(20)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL; DEFAULT &#x27;pendente&#x27;; CHECK (status IN (&#x27;pago&#x27;, &#x27;pendente&#x27;, &#x27;atrasado&#x27;))</td>
+                        <td>Situação do pagamento</td>
+                        <td>Obrigatório; valores: pago, pendente ou atrasado; inicia como pendente</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <section class="entidade" id="tb-pintura">
+
+        <h2>Entidade: Pintura (tabela pintura)</h2>
+
+        <div class="tabela">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Tipo</th>
+                        <th>Chave</th>
+                        <th>Restrições (SQL)</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="mono">id_pintura</td>
+                        <td class="mono">int</td>
+                        <td class="chave">PK</td>
+                        <td class="mono">PRIMARY KEY; AUTO_INCREMENT; NOT NULL</td>
+                        <td>Identificador único do registro de pintura</td>
+                        <td>Obrigatório; gerado pelo sistema (auto incremento)</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">id_obra</td>
+                        <td class="mono">int</td>
+                        <td class="chave">FK</td>
+                        <td class="mono">NOT NULL; FOREIGN KEY → obra.id_obra</td>
+                        <td>Obra em que o serviço de pintura é executado</td>
+                        <td>Obrigatório; deve existir em obra.id_obra</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">descricao</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Descrição do serviço de pintura executado</td>
+                        <td>Obrigatório</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">data_execucao</td>
+                        <td class="mono">date</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Data de execução do serviço</td>
+                        <td>Obrigatório</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">responsavel</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Nome do responsável pela execução</td>
+                        <td>Obrigatório</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <section class="entidade" id="tb-eletrica">
+
+        <h2>Entidade: Elétrica (tabela eletrica)</h2>
+
+        <div class="tabela">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Tipo</th>
+                        <th>Chave</th>
+                        <th>Restrições (SQL)</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="mono">id_eletrica</td>
+                        <td class="mono">int</td>
+                        <td class="chave">PK</td>
+                        <td class="mono">PRIMARY KEY; AUTO_INCREMENT; NOT NULL</td>
+                        <td>Identificador único do registro de elétrica</td>
+                        <td>Obrigatório; gerado pelo sistema (auto incremento)</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">id_obra</td>
+                        <td class="mono">int</td>
+                        <td class="chave">FK</td>
+                        <td class="mono">NOT NULL; FOREIGN KEY → obra.id_obra</td>
+                        <td>Obra em que o serviço de elétrica é executado</td>
+                        <td>Obrigatório; deve existir em obra.id_obra</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">descricao</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Descrição do serviço de elétrica executado</td>
+                        <td>Obrigatório</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">data_execucao</td>
+                        <td class="mono">date</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Data de execução do serviço</td>
+                        <td>Obrigatório</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">responsavel</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Nome do responsável pela execução</td>
+                        <td>Obrigatório</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <section class="entidade" id="tb-hidraulica">
+
+        <h2>Entidade: Hidráulica (tabela hidraulica)</h2>
+
+        <div class="tabela">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Tipo</th>
+                        <th>Chave</th>
+                        <th>Restrições (SQL)</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="mono">id_hidraulica</td>
+                        <td class="mono">int</td>
+                        <td class="chave">PK</td>
+                        <td class="mono">PRIMARY KEY; AUTO_INCREMENT; NOT NULL</td>
+                        <td>Identificador único do registro de hidráulica</td>
+                        <td>Obrigatório; gerado pelo sistema (auto incremento)</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">id_obra</td>
+                        <td class="mono">int</td>
+                        <td class="chave">FK</td>
+                        <td class="mono">NOT NULL; FOREIGN KEY → obra.id_obra</td>
+                        <td>Obra em que o serviço de hidráulica é executado</td>
+                        <td>Obrigatório; deve existir em obra.id_obra</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">descricao</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Descrição do serviço de hidráulica executado</td>
+                        <td>Obrigatório</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">data_execucao</td>
+                        <td class="mono">date</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Data de execução do serviço</td>
+                        <td>Obrigatório</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">responsavel</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Nome do responsável pela execução</td>
+                        <td>Obrigatório</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <section class="entidade" id="tb-acabamento">
+
+        <h2>Entidade: Acabamento (tabela acabamento)</h2>
+
+        <div class="tabela">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Tipo</th>
+                        <th>Chave</th>
+                        <th>Restrições (SQL)</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="mono">id_acabamento</td>
+                        <td class="mono">int</td>
+                        <td class="chave">PK</td>
+                        <td class="mono">PRIMARY KEY; AUTO_INCREMENT; NOT NULL</td>
+                        <td>Identificador único do registro de acabamento</td>
+                        <td>Obrigatório; gerado pelo sistema (auto incremento)</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">id_obra</td>
+                        <td class="mono">int</td>
+                        <td class="chave">FK</td>
+                        <td class="mono">NOT NULL; FOREIGN KEY → obra.id_obra</td>
+                        <td>Obra em que o serviço de acabamento é executado</td>
+                        <td>Obrigatório; deve existir em obra.id_obra</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">descricao</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Descrição do serviço de acabamento executado</td>
+                        <td>Obrigatório</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">data_execucao</td>
+                        <td class="mono">date</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Data de execução do serviço</td>
+                        <td>Obrigatório</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">responsavel</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Nome do responsável pela execução</td>
+                        <td>Obrigatório</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <section class="entidade" id="tb-material">
+
+        <h2>Entidade: Material (tabela material)</h2>
+
+        <div class="tabela">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Tipo</th>
+                        <th>Chave</th>
+                        <th>Restrições (SQL)</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="mono">id_material</td>
+                        <td class="mono">int</td>
+                        <td class="chave">PK</td>
+                        <td class="mono">PRIMARY KEY; AUTO_INCREMENT; NOT NULL</td>
+                        <td>Identificador único do material</td>
+                        <td>Obrigatório; gerado pelo sistema (auto incremento)</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">id_obra</td>
+                        <td class="mono">int</td>
+                        <td class="chave">FK</td>
+                        <td class="mono">NOT NULL; FOREIGN KEY → obra.id_obra</td>
+                        <td>Obra para a qual o material é destinado</td>
+                        <td>Obrigatório; deve existir em obra.id_obra</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">nome</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
                         <td>Nome do material (ex.: cimento, tinta, fio elétrico)</td>
                         <td>Obrigatório</td>
                     </tr>
-
                     <tr>
-                        <td>unidade_medida</td>
-                        <td>Unidade de controle (ex.: kg, litro, unidade, saco)</td>
+                        <td class="mono">tipo</td>
+                        <td class="mono">varchar(50)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Tipo/categoria do material (ex.: elétrico, hidráulico, alvenaria, tinta)</td>
                         <td>Obrigatório</td>
                     </tr>
-
                     <tr>
-                        <td>quantidade_estoque</td>
-                        <td>Quantidade atualmente em estoque</td>
-                        <td>Obrigatório; não deve ficar negativa</td>
+                        <td class="mono">quantidade</td>
+                        <td class="mono">decimal(10,2)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL; CHECK (quantidade &gt; 0)</td>
+                        <td>Quantidade do material destinada à obra</td>
+                        <td>Obrigatório; maior que zero</td>
                     </tr>
-
                     <tr>
-                        <td>valor_unitario_referencia</td>
-                        <td>Valor de referência por unidade</td>
-                        <td>Opcional</td>
+                        <td class="mono">unidade</td>
+                        <td class="mono">varchar(20)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Unidade de medida da quantidade (ex.: kg, litro, m², unidade, saco)</td>
+                        <td>Obrigatório</td>
                     </tr>
-
                 </tbody>
-
             </table>
-
         </div>
 
     </section>
 
+    <h2 class="bloco" id="relacionamentos">3. Relacionamentos: cardinalidades e definições</h2>
 
-    <!-- ========================= -->
-    <!-- COMPRA -->
-    <!-- ========================= -->
+    <p class="texto">Todos os relacionamentos do modelo são 1:N e derivam das chaves estrangeiras do DER. Como todas as FKs são NOT NULL, a participação do lado filho é sempre obrigatória: nenhum registro filho existe sem o pai.</p>
 
-    <section class="entidade">
+    <section class="entidade relacionamento" id="tb-relacionamentos">
 
-        <h2>Entidade: Compra</h2>
+        <h2>Tabela de relacionamentos</h2>
 
         <div class="tabela">
-
             <table>
-
                 <thead>
                     <tr>
-                        <th>Atributo</th>
-                        <th>Descrição</th>
-                        <th>Regra de negócio associada</th>
+                        <th>Tabela pai (lado 1)</th>
+                        <th>Tabela filha (lado N)</th>
+                        <th>Chave estrangeira</th>
+                        <th>Constraint</th>
+                        <th>Cardinalidade</th>
+                        <th>Participação</th>
+                        <th>ON DELETE</th>
+                        <th>ON UPDATE</th>
+                        <th>Definição</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                     <tr>
-                        <td>id_compra</td>
-                        <td>Identificador único da compra</td>
-                        <td>Obrigatório</td>
+                        <td>cliente</td>
+                        <td>obra</td>
+                        <td class="mono">obra.id_cliente → cliente.id_cliente</td>
+                        <td class="mono">fk_obra_cliente</td>
+                        <td>1 : N</td>
+                        <td>Pai: 0..N filhos; filho: exatamente 1 pai</td>
+                        <td>RESTRICT</td>
+                        <td>CASCADE</td>
+                        <td>Um cliente possui várias obras; cada obra pertence a um único cliente</td>
                     </tr>
-
                     <tr>
-                        <td>id_fornecedor</td>
-                        <td>Fornecedor que vendeu os materiais</td>
-                        <td>Obrigatório</td>
+                        <td>obra</td>
+                        <td>funcionario</td>
+                        <td class="mono">funcionario.id_obra → obra.id_obra</td>
+                        <td class="mono">fk_funcionario_obra</td>
+                        <td>1 : N</td>
+                        <td>Pai: 0..N filhos; filho: exatamente 1 pai</td>
+                        <td>RESTRICT</td>
+                        <td>CASCADE</td>
+                        <td>Uma obra possui vários funcionários alocados; cada funcionário está alocado a uma única obra</td>
                     </tr>
-
                     <tr>
-                        <td>id_obra</td>
-                        <td>Obra para a qual a compra foi destinada</td>
-                        <td>Opcional — pode haver compra para estoque geral</td>
+                        <td>obra</td>
+                        <td>prestador</td>
+                        <td class="mono">prestador.id_obra → obra.id_obra</td>
+                        <td class="mono">fk_prestador_obra</td>
+                        <td>1 : N</td>
+                        <td>Pai: 0..N filhos; filho: exatamente 1 pai</td>
+                        <td>RESTRICT</td>
+                        <td>CASCADE</td>
+                        <td>Uma obra possui vários prestadores; cada prestador atua em uma única obra</td>
                     </tr>
-
                     <tr>
-                        <td>data_compra</td>
-                        <td>Data em que a compra foi realizada</td>
-                        <td>Obrigatório</td>
+                        <td>obra</td>
+                        <td>orcamento</td>
+                        <td class="mono">orcamento.id_obra → obra.id_obra</td>
+                        <td class="mono">fk_orcamento_obra</td>
+                        <td>1 : N</td>
+                        <td>Pai: 0..N filhos; filho: exatamente 1 pai</td>
+                        <td>RESTRICT</td>
+                        <td>CASCADE</td>
+                        <td>Uma obra pode ter vários orçamentos; cada orçamento se refere a uma única obra</td>
                     </tr>
-
                     <tr>
-                        <td>valor_total</td>
-                        <td>Valor total da compra</td>
-                        <td>Calculado a partir dos itens da compra</td>
+                        <td>cliente</td>
+                        <td>orcamento</td>
+                        <td class="mono">orcamento.id_cliente → cliente.id_cliente</td>
+                        <td class="mono">fk_orcamento_cliente</td>
+                        <td>1 : N</td>
+                        <td>Pai: 0..N filhos; filho: exatamente 1 pai</td>
+                        <td>RESTRICT</td>
+                        <td>CASCADE</td>
+                        <td>Um cliente pode solicitar vários orçamentos; cada orçamento tem um único cliente solicitante</td>
                     </tr>
-
+                    <tr>
+                        <td>orcamento</td>
+                        <td>pagamento</td>
+                        <td class="mono">pagamento.id_orcamento → orcamento.id_orcamento</td>
+                        <td class="mono">fk_pagamento_orcamento</td>
+                        <td>1 : N</td>
+                        <td>Pai: 0..N filhos; filho: exatamente 1 pai</td>
+                        <td>RESTRICT</td>
+                        <td>CASCADE</td>
+                        <td>Um orçamento pode ser pago em vários pagamentos (parcelas); cada pagamento se refere a um único orçamento</td>
+                    </tr>
+                    <tr>
+                        <td>obra</td>
+                        <td>pintura</td>
+                        <td class="mono">pintura.id_obra → obra.id_obra</td>
+                        <td class="mono">fk_pintura_obra</td>
+                        <td>1 : N</td>
+                        <td>Pai: 0..N filhos; filho: exatamente 1 pai</td>
+                        <td>RESTRICT</td>
+                        <td>CASCADE</td>
+                        <td>Uma obra possui vários registros de pintura; cada registro pertence a uma única obra</td>
+                    </tr>
+                    <tr>
+                        <td>obra</td>
+                        <td>eletrica</td>
+                        <td class="mono">eletrica.id_obra → obra.id_obra</td>
+                        <td class="mono">fk_eletrica_obra</td>
+                        <td>1 : N</td>
+                        <td>Pai: 0..N filhos; filho: exatamente 1 pai</td>
+                        <td>RESTRICT</td>
+                        <td>CASCADE</td>
+                        <td>Uma obra possui vários registros de elétrica; cada registro pertence a uma única obra</td>
+                    </tr>
+                    <tr>
+                        <td>obra</td>
+                        <td>hidraulica</td>
+                        <td class="mono">hidraulica.id_obra → obra.id_obra</td>
+                        <td class="mono">fk_hidraulica_obra</td>
+                        <td>1 : N</td>
+                        <td>Pai: 0..N filhos; filho: exatamente 1 pai</td>
+                        <td>RESTRICT</td>
+                        <td>CASCADE</td>
+                        <td>Uma obra possui vários registros de hidráulica; cada registro pertence a uma única obra</td>
+                    </tr>
+                    <tr>
+                        <td>obra</td>
+                        <td>acabamento</td>
+                        <td class="mono">acabamento.id_obra → obra.id_obra</td>
+                        <td class="mono">fk_acabamento_obra</td>
+                        <td>1 : N</td>
+                        <td>Pai: 0..N filhos; filho: exatamente 1 pai</td>
+                        <td>RESTRICT</td>
+                        <td>CASCADE</td>
+                        <td>Uma obra possui vários registros de acabamento; cada registro pertence a uma única obra</td>
+                    </tr>
+                    <tr>
+                        <td>obra</td>
+                        <td>material</td>
+                        <td class="mono">material.id_obra → obra.id_obra</td>
+                        <td class="mono">fk_material_obra</td>
+                        <td>1 : N</td>
+                        <td>Pai: 0..N filhos; filho: exatamente 1 pai</td>
+                        <td>RESTRICT</td>
+                        <td>CASCADE</td>
+                        <td>Uma obra utiliza vários materiais; cada material está destinado a uma única obra</td>
+                    </tr>
                 </tbody>
-
             </table>
-
         </div>
 
     </section>
-
-
-    <!-- ========================= -->
-    <!-- RELACIONAMENTO COMPRA-MATERIAL -->
-    <!-- ========================= -->
 
     <section class="entidade relacionamento">
 
-        <h2>Relacionamento N:N com Atributos: Compra &mdash; compõe &mdash; Material</h2>
-
-        <p class="nota">Mesmo caso de Orçamento-Serviço: não é entidade própria. Quantidade e valor pago por material comprado são atributos do relacionamento N:N entre Compra e Material, não de uma "Item_Compra" separada.</p>
+        <h2>Definições de cardinalidade e integridade</h2>
 
         <div class="tabela">
-
             <table>
-
                 <thead>
                     <tr>
-                        <th>Atributo do relacionamento</th>
-                        <th>Descrição</th>
-                        <th>Regra de negócio associada</th>
+                        <th>Termo</th>
+                        <th>Definição</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                     <tr>
-                        <td>quantidade</td>
-                        <td>Quantidade comprada daquele material</td>
-                        <td>Obrigatório, maior que zero</td>
+                        <td>1 : N</td>
+                        <td>Um registro da tabela pai se relaciona com zero, um ou vários registros da tabela filha; cada registro da filha se relaciona com exatamente um registro do pai</td>
                     </tr>
-
                     <tr>
-                        <td>valor_unitario</td>
-                        <td>Valor unitário pago naquela compra</td>
-                        <td>Obrigatório</td>
+                        <td>0..N</td>
+                        <td>Lado pai: o pai pode existir sem filhos (ex.: cliente recém-cadastrado, ainda sem obras)</td>
                     </tr>
-
                     <tr>
-                        <td>valor_item</td>
-                        <td>Valor total do item (quantidade × valor_unitario)</td>
-                        <td>Calculado; compõe o valor_total da compra</td>
+                        <td>Exatamente 1</td>
+                        <td>Lado filho: a FK é NOT NULL, então todo filho precisa de um pai existente</td>
                     </tr>
-
+                    <tr>
+                        <td>ON DELETE RESTRICT</td>
+                        <td>Impede excluir um registro pai enquanto houver filhos que o referenciem (ex.: não é possível excluir uma obra que tenha materiais)</td>
+                    </tr>
+                    <tr>
+                        <td>ON UPDATE CASCADE</td>
+                        <td>Se a chave primária do pai mudar, a FK nos filhos é atualizada automaticamente</td>
+                    </tr>
+                    <tr>
+                        <td>Entidade sem relacionamento</td>
+                        <td>servico não possui FK nem é referenciada por outra tabela no DER; funciona como catálogo de consulta</td>
+                    </tr>
                 </tbody>
-
             </table>
-
         </div>
 
     </section>
 
+    <h2 class="bloco" id="indices">4. Índices</h2>
 
-    <!-- ========================= -->
-    <!-- RODAPÉ -->
-    <!-- ========================= -->
+    <p class="texto">Índices criados no banco. As chaves primárias usam o índice implícito PRIMARY; os índices das FKs aceleram junções e a verificação de integridade.</p>
+
+    <section class="entidade relacionamento" id="tb-indices">
+
+        <h2>Relação de índices</h2>
+
+        <div class="tabela">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Índice</th>
+                        <th>Tabela</th>
+                        <th>Colunas</th>
+                        <th>Tipo</th>
+                        <th>Finalidade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="mono">PRIMARY</td>
+                        <td class="mono">cliente</td>
+                        <td class="mono">id_cliente</td>
+                        <td>PRIMARY KEY</td>
+                        <td>Identificação única do registro</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">uq_cliente_cpf_cnpj</td>
+                        <td class="mono">cliente</td>
+                        <td class="mono">cpf_cnpj</td>
+                        <td>UNIQUE</td>
+                        <td>Impede duplicidade de cpf_cnpj</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">PRIMARY</td>
+                        <td class="mono">obra</td>
+                        <td class="mono">id_obra</td>
+                        <td>PRIMARY KEY</td>
+                        <td>Identificação única do registro</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">idx_obra_id_cliente</td>
+                        <td class="mono">obra</td>
+                        <td class="mono">id_cliente</td>
+                        <td>INDEX (FK)</td>
+                        <td>Acelera junções e verificações da FK para cliente</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">PRIMARY</td>
+                        <td class="mono">servico</td>
+                        <td class="mono">id_servico</td>
+                        <td>PRIMARY KEY</td>
+                        <td>Identificação única do registro</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">PRIMARY</td>
+                        <td class="mono">funcionario</td>
+                        <td class="mono">id_funcionario</td>
+                        <td>PRIMARY KEY</td>
+                        <td>Identificação única do registro</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">uq_funcionario_cpf</td>
+                        <td class="mono">funcionario</td>
+                        <td class="mono">cpf</td>
+                        <td>UNIQUE</td>
+                        <td>Impede duplicidade de cpf</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">idx_funcionario_id_obra</td>
+                        <td class="mono">funcionario</td>
+                        <td class="mono">id_obra</td>
+                        <td>INDEX (FK)</td>
+                        <td>Acelera junções e verificações da FK para obra</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">PRIMARY</td>
+                        <td class="mono">prestador</td>
+                        <td class="mono">id_prestador</td>
+                        <td>PRIMARY KEY</td>
+                        <td>Identificação única do registro</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">uq_prestador_cpf</td>
+                        <td class="mono">prestador</td>
+                        <td class="mono">cpf</td>
+                        <td>UNIQUE</td>
+                        <td>Impede duplicidade de cpf</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">idx_prestador_id_obra</td>
+                        <td class="mono">prestador</td>
+                        <td class="mono">id_obra</td>
+                        <td>INDEX (FK)</td>
+                        <td>Acelera junções e verificações da FK para obra</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">PRIMARY</td>
+                        <td class="mono">orcamento</td>
+                        <td class="mono">id_orcamento</td>
+                        <td>PRIMARY KEY</td>
+                        <td>Identificação única do registro</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">idx_orcamento_id_obra</td>
+                        <td class="mono">orcamento</td>
+                        <td class="mono">id_obra</td>
+                        <td>INDEX (FK)</td>
+                        <td>Acelera junções e verificações da FK para obra</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">idx_orcamento_id_cliente</td>
+                        <td class="mono">orcamento</td>
+                        <td class="mono">id_cliente</td>
+                        <td>INDEX (FK)</td>
+                        <td>Acelera junções e verificações da FK para cliente</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">PRIMARY</td>
+                        <td class="mono">pagamento</td>
+                        <td class="mono">id_pagamento</td>
+                        <td>PRIMARY KEY</td>
+                        <td>Identificação única do registro</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">idx_pagamento_id_orcamento</td>
+                        <td class="mono">pagamento</td>
+                        <td class="mono">id_orcamento</td>
+                        <td>INDEX (FK)</td>
+                        <td>Acelera junções e verificações da FK para orcamento</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">PRIMARY</td>
+                        <td class="mono">pintura</td>
+                        <td class="mono">id_pintura</td>
+                        <td>PRIMARY KEY</td>
+                        <td>Identificação única do registro</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">idx_pintura_id_obra</td>
+                        <td class="mono">pintura</td>
+                        <td class="mono">id_obra</td>
+                        <td>INDEX (FK)</td>
+                        <td>Acelera junções e verificações da FK para obra</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">PRIMARY</td>
+                        <td class="mono">eletrica</td>
+                        <td class="mono">id_eletrica</td>
+                        <td>PRIMARY KEY</td>
+                        <td>Identificação única do registro</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">idx_eletrica_id_obra</td>
+                        <td class="mono">eletrica</td>
+                        <td class="mono">id_obra</td>
+                        <td>INDEX (FK)</td>
+                        <td>Acelera junções e verificações da FK para obra</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">PRIMARY</td>
+                        <td class="mono">hidraulica</td>
+                        <td class="mono">id_hidraulica</td>
+                        <td>PRIMARY KEY</td>
+                        <td>Identificação única do registro</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">idx_hidraulica_id_obra</td>
+                        <td class="mono">hidraulica</td>
+                        <td class="mono">id_obra</td>
+                        <td>INDEX (FK)</td>
+                        <td>Acelera junções e verificações da FK para obra</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">PRIMARY</td>
+                        <td class="mono">acabamento</td>
+                        <td class="mono">id_acabamento</td>
+                        <td>PRIMARY KEY</td>
+                        <td>Identificação única do registro</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">idx_acabamento_id_obra</td>
+                        <td class="mono">acabamento</td>
+                        <td class="mono">id_obra</td>
+                        <td>INDEX (FK)</td>
+                        <td>Acelera junções e verificações da FK para obra</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">PRIMARY</td>
+                        <td class="mono">material</td>
+                        <td class="mono">id_material</td>
+                        <td>PRIMARY KEY</td>
+                        <td>Identificação única do registro</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">idx_material_id_obra</td>
+                        <td class="mono">material</td>
+                        <td class="mono">id_obra</td>
+                        <td>INDEX (FK)</td>
+                        <td>Acelera junções e verificações da FK para obra</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">idx_cliente_nome</td>
+                        <td class="mono">cliente</td>
+                        <td class="mono">nome</td>
+                        <td>INDEX</td>
+                        <td>Busca de clientes por nome</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">idx_servico_tipo</td>
+                        <td class="mono">servico</td>
+                        <td class="mono">tipo</td>
+                        <td>INDEX</td>
+                        <td>Filtro do catálogo por tipo de serviço</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">idx_obra_status</td>
+                        <td class="mono">obra</td>
+                        <td class="mono">status</td>
+                        <td>INDEX</td>
+                        <td>Listagem de obras por situação</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">idx_orcamento_status</td>
+                        <td class="mono">orcamento</td>
+                        <td class="mono">status</td>
+                        <td>INDEX</td>
+                        <td>Listagem de orçamentos por situação</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">idx_pagamento_status</td>
+                        <td class="mono">pagamento</td>
+                        <td class="mono">status</td>
+                        <td>INDEX</td>
+                        <td>Controle de pagamentos pendentes e atrasados</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">idx_pagamento_data_pagamento</td>
+                        <td class="mono">pagamento</td>
+                        <td class="mono">data_pagamento</td>
+                        <td>INDEX</td>
+                        <td>Relatórios financeiros por período</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">PRIMARY</td>
+                        <td class="mono">log_auditoria</td>
+                        <td class="mono">id_log</td>
+                        <td>PRIMARY KEY</td>
+                        <td>Identificação única do registro</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">idx_log_tabela_registro</td>
+                        <td class="mono">log_auditoria</td>
+                        <td class="mono">tabela_afetada, id_registro</td>
+                        <td>INDEX</td>
+                        <td>Histórico de um registro específico</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">idx_log_data_hora</td>
+                        <td class="mono">log_auditoria</td>
+                        <td class="mono">data_hora</td>
+                        <td>INDEX</td>
+                        <td>Consulta do log por período</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <h2 class="bloco" id="fluxo">5. Fluxo de dados</h2>
+
+    <p class="texto">Caminho percorrido pelos dados, do cadastro do cliente à conclusão da obra. Como orcamento.id_obra é obrigatório, a obra é cadastrada (como planejada) antes de o orçamento ser emitido.</p>
+
+    <section class="entidade relacionamento" id="tb-fluxo">
+
+        <h2>Etapas do fluxo</h2>
+
+        <div class="tabela">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Etapa</th>
+                        <th>Evento</th>
+                        <th>Origem do dado</th>
+                        <th>Tabela(s) afetada(s)</th>
+                        <th>Dados gravados</th>
+                        <th>Condição / regra</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Cadastro do cliente</td>
+                        <td>Atendimento (informado pelo cliente)</td>
+                        <td>cliente</td>
+                        <td>nome, cpf_cnpj, telefone, email, endereco; data_cadastro automática</td>
+                        <td>cpf_cnpj não pode repetir</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Cadastro da obra</td>
+                        <td>Atendimento / comercial</td>
+                        <td>obra</td>
+                        <td>id_cliente, endereco, responsavel_cliente, tipo_servico, data_inicio; status = planejada</td>
+                        <td>O cliente precisa existir (FK)</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Consulta ao catálogo</td>
+                        <td>Equipe comercial</td>
+                        <td>servico (somente leitura)</td>
+                        <td>valor_padrao, tempo_padrao e tempo_estimado usados como base do orçamento</td>
+                        <td>Nenhuma gravação nesta etapa</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Emissão do orçamento</td>
+                        <td>Equipe comercial</td>
+                        <td>orcamento</td>
+                        <td>id_obra, id_cliente, valor_total, data_emissao; status = pendente</td>
+                        <td>Obra e cliente precisam existir (FKs)</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Decisão do cliente</td>
+                        <td>Cliente</td>
+                        <td>orcamento</td>
+                        <td>status passa para aprovado ou recusado</td>
+                        <td>Regra da aplicação: só orçamento aprovado segue para pagamento e execução</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Registro de pagamentos</td>
+                        <td>Financeiro</td>
+                        <td>pagamento</td>
+                        <td>id_orcamento, forma_pagamento, valor, status; data_pagamento ao pagar</td>
+                        <td>status = pago exige data_pagamento (CHECK)</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>Alocação de mão de obra</td>
+                        <td>Gestão da obra / RH</td>
+                        <td>funcionario, prestador</td>
+                        <td>id_obra e dados do profissional</td>
+                        <td>Funcionário só é alocado se status = ativo (regra da aplicação)</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>Execução dos serviços</td>
+                        <td>Responsável pela execução</td>
+                        <td>pintura, eletrica, hidraulica, acabamento</td>
+                        <td>id_obra, descricao, data_execucao, responsavel</td>
+                        <td>Um registro por serviço executado na obra</td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>Controle de materiais</td>
+                        <td>Gestão da obra</td>
+                        <td>material</td>
+                        <td>id_obra, nome, tipo, quantidade, unidade</td>
+                        <td>quantidade maior que zero (CHECK)</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Andamento e conclusão</td>
+                        <td>Gestão da obra</td>
+                        <td>obra</td>
+                        <td>status: em andamento, pausada ou concluida; data_fim ao concluir</td>
+                        <td>data_fim não pode ser anterior a data_inicio (CHECK)</td>
+                    </tr>
+                    <tr>
+                        <td>11</td>
+                        <td>Auditoria</td>
+                        <td>Automática (triggers do banco)</td>
+                        <td>log_auditoria</td>
+                        <td>Toda inclusão, alteração e exclusão das 12 tabelas acima</td>
+                        <td>Não depende da aplicação; ver seção 6</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <section class="entidade relacionamento">
+
+        <h2>Visão resumida do fluxo</h2>
+
+        <div class="tabela">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sequência</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="mono">cliente → obra → orcamento → pagamento</td>
+                        <td>Fluxo comercial e financeiro</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">obra → funcionario / prestador</td>
+                        <td>Alocação de mão de obra</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">obra → pintura / eletrica / hidraulica / acabamento</td>
+                        <td>Execução dos serviços</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">obra → material</td>
+                        <td>Materiais usados na obra</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">todas as tabelas → log_auditoria</td>
+                        <td>Registro automático de operações</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <h2 class="bloco" id="log">6. Log de auditoria</h2>
+
+    <p class="texto">Registro de quem alterou o quê e quando. É uma tabela de apoio, que não aparece no DER, preenchida automaticamente por triggers. Atende ao registro das operações de tratamento previsto no art. 37 da LGPD.</p>
+
+    <section class="entidade associativa" id="tb-log_auditoria">
+
+        <h2>Tabela de apoio: log_auditoria</h2>
+
+        <div class="tabela">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Atributo</th>
+                        <th>Tipo</th>
+                        <th>Chave</th>
+                        <th>Restrições (SQL)</th>
+                        <th>Descrição</th>
+                        <th>Regra de negócio associada</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="mono">id_log</td>
+                        <td class="mono">bigint</td>
+                        <td class="chave">PK</td>
+                        <td class="mono">PRIMARY KEY; AUTO_INCREMENT; NOT NULL</td>
+                        <td>Identificador único do registro de log</td>
+                        <td>Obrigatório; gerado pelo sistema (auto incremento)</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">tabela_afetada</td>
+                        <td class="mono">varchar(50)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Nome da tabela em que a operação ocorreu</td>
+                        <td>Obrigatório</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">id_registro</td>
+                        <td class="mono">int</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Valor da chave primária do registro afetado</td>
+                        <td>Obrigatório</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">operacao</td>
+                        <td class="mono">varchar(10)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL; CHECK (operacao IN (&#x27;INSERT&#x27;, &#x27;UPDATE&#x27;, &#x27;DELETE&#x27;))</td>
+                        <td>Tipo da operação realizada</td>
+                        <td>Obrigatório; valores: INSERT, UPDATE ou DELETE</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">dados_anteriores</td>
+                        <td class="mono">json</td>
+                        <td class="chave"></td>
+                        <td class="mono">NULL</td>
+                        <td>Valores das colunas antes da operação (UPDATE e DELETE)</td>
+                        <td>Opcional; nulo em INSERT</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">dados_novos</td>
+                        <td class="mono">json</td>
+                        <td class="chave"></td>
+                        <td class="mono">NULL</td>
+                        <td>Valores das colunas após a operação (INSERT e UPDATE)</td>
+                        <td>Opcional; nulo em DELETE</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">usuario</td>
+                        <td class="mono">varchar(100)</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL</td>
+                        <td>Usuário do banco que executou a operação (CURRENT_USER)</td>
+                        <td>Obrigatório</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">data_hora</td>
+                        <td class="mono">datetime</td>
+                        <td class="chave"></td>
+                        <td class="mono">NOT NULL; DEFAULT CURRENT_TIMESTAMP</td>
+                        <td>Momento em que a operação foi registrada</td>
+                        <td>Obrigatório; preenchido pelo sistema</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <section class="entidade relacionamento">
+
+        <h2>Funcionamento do log</h2>
+
+        <div class="tabela">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspecto</th>
+                        <th>Definição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="chave">Cobertura</td>
+                        <td>As 12 tabelas do DER; 3 triggers por tabela (36 no total): trg_&lt;tabela&gt;_ai, trg_&lt;tabela&gt;_au e trg_&lt;tabela&gt;_ad</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">O que é gravado</td>
+                        <td>Tabela, valor da PK, operação, valores antes e depois (JSON), usuário do banco e data/hora</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">INSERT</td>
+                        <td>dados_anteriores = NULL; dados_novos = linha criada</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">UPDATE</td>
+                        <td>dados_anteriores = linha antes da alteração; dados_novos = linha depois</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">DELETE</td>
+                        <td>dados_anteriores = linha excluída; dados_novos = NULL</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Imutabilidade</td>
+                        <td>A aplicação não deve conceder UPDATE nem DELETE sobre log_auditoria a nenhum usuário comum</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Acesso</td>
+                        <td>Restrito ao administrador do banco e ao encarregado de dados, pois o JSON contém dados pessoais</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">Retenção sugerida</td>
+                        <td>12 meses; o prazo definitivo deve ser validado com o encarregado de dados</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <p class="texto">Exemplo de trigger (as demais seguem o mesmo padrão, trocando tabela, chave primária e colunas):</p>
+
+    <pre>CREATE TRIGGER trg_cliente_au AFTER UPDATE ON cliente FOR EACH ROW
+  INSERT INTO log_auditoria (tabela_afetada, id_registro, operacao, dados_anteriores, dados_novos, usuario)
+  VALUES (&#x27;cliente&#x27;, NEW.id_cliente, &#x27;UPDATE&#x27;,
+          JSON_OBJECT(&#x27;id_cliente&#x27;, OLD.id_cliente, &#x27;nome&#x27;, OLD.nome, ...),
+          JSON_OBJECT(&#x27;id_cliente&#x27;, NEW.id_cliente, &#x27;nome&#x27;, NEW.nome, ...),
+          CURRENT_USER());</pre>
+
+    <h2 class="bloco" id="lgpd">7. LGPD (Lei 13.709/2018)</h2>
+
+    <div class="aviso">Esta seção é um apoio de modelagem: identifica os dados pessoais do banco e sugere finalidade, base legal e retenção. As bases legais e os prazos são sugestões e devem ser validados com o jurídico e com o encarregado de dados (art. 41 da LGPD).</div>
+
+    <section class="entidade relacionamento" id="tb-lgpd">
+
+        <h2>Inventário de dados pessoais</h2>
+
+        <div class="tabela">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tabela</th>
+                        <th>Colunas com dado pessoal</th>
+                        <th>Titular</th>
+                        <th>Finalidade</th>
+                        <th>Base legal sugerida (art. 7º)</th>
+                        <th>Retenção sugerida</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="chave">cliente</td>
+                        <td>nome, cpf_cnpj, email, telefone, endereco</td>
+                        <td>Cliente (pessoa física ou representante da pessoa jurídica)</td>
+                        <td>Identificar o contratante, emitir orçamentos, contratar e cobrar</td>
+                        <td>V (execução de contrato ou procedimentos preliminares); II (obrigação legal, no que envolver emissão fiscal)</td>
+                        <td>5 anos após o fim do relacionamento</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">obra</td>
+                        <td>responsavel_cliente, endereco</td>
+                        <td>Responsável indicado pelo cliente</td>
+                        <td>Contato e localização para execução da obra</td>
+                        <td>V (execução de contrato)</td>
+                        <td>5 anos após a conclusão da obra</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">funcionario</td>
+                        <td>nome, cpf, telefone, email, cargo, data_admissao</td>
+                        <td>Funcionário</td>
+                        <td>Gestão do vínculo de trabalho e alocação em obras</td>
+                        <td>II (obrigação legal trabalhista/previdenciária); V (execução de contrato de trabalho)</td>
+                        <td>5 anos após o desligamento</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">prestador</td>
+                        <td>nome, cpf, telefone, email, especialidade</td>
+                        <td>Prestador de serviço</td>
+                        <td>Contratação e controle de serviços terceirizados</td>
+                        <td>V (execução de contrato); II (obrigação fiscal)</td>
+                        <td>5 anos após o fim do contrato</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">pintura, eletrica, hidraulica, acabamento</td>
+                        <td>responsavel</td>
+                        <td>Responsável pela execução</td>
+                        <td>Controle e rastreabilidade da execução dos serviços</td>
+                        <td>V (execução de contrato); IX (legítimo interesse)</td>
+                        <td>Acompanha a retenção da obra</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">orcamento, pagamento</td>
+                        <td>Sem identificador direto; ligados ao cliente por id_cliente e id_orcamento</td>
+                        <td>Cliente</td>
+                        <td>Controle comercial e financeiro</td>
+                        <td>V (execução de contrato); II (obrigação legal fiscal)</td>
+                        <td>5 anos (prazo fiscal), a validar</td>
+                    </tr>
+                    <tr>
+                        <td class="chave">log_auditoria</td>
+                        <td>usuario e o JSON de dados_anteriores / dados_novos (cópia dos dados acima)</td>
+                        <td>Todos os titulares acima e usuários do sistema</td>
+                        <td>Segurança e registro das operações de tratamento (art. 37)</td>
+                        <td>IX (legítimo interesse: segurança e prevenção a fraudes); II (obrigação legal)</td>
+                        <td>12 meses</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <section class="entidade relacionamento">
+
+        <h2>Dados sensíveis</h2>
+
+        <div class="tabela">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspecto</th>
+                        <th>Definição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Dados pessoais sensíveis</td>
+                        <td>O modelo não armazena dados sensíveis (art. 5º, II): não há saúde, biometria, origem racial, religião, filiação sindical ou similares</td>
+                    </tr>
+                    <tr>
+                        <td>Atenção</td>
+                        <td>Se algum campo livre (descricao, por exemplo) passar a receber esse tipo de informação, a base legal precisa ser revista com base no art. 11</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <section class="entidade relacionamento">
+
+        <h2>Direitos do titular (art. 18) e como o modelo atende</h2>
+
+        <div class="tabela">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Direito</th>
+                        <th>Atendimento no banco de dados</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Confirmação e acesso aos dados</td>
+                        <td>Consulta por cpf_cnpj (cliente) ou cpf (funcionario, prestador), seguindo as tabelas do inventário</td>
+                    </tr>
+                    <tr>
+                        <td>Correção de dados</td>
+                        <td>UPDATE nas tabelas de origem; a alteração fica registrada em log_auditoria</td>
+                    </tr>
+                    <tr>
+                        <td>Anonimização, bloqueio ou eliminação de dados desnecessários</td>
+                        <td>Por causa do ON DELETE RESTRICT, registros com histórico não podem ser excluídos; usa-se anonimização por UPDATE (ex.: substituir nome, email e telefone) e exclusão apenas de registros sem vínculos</td>
+                    </tr>
+                    <tr>
+                        <td>Portabilidade</td>
+                        <td>Exportação dos dados do titular a partir das tabelas do inventário</td>
+                    </tr>
+                    <tr>
+                        <td>Informação sobre compartilhamento</td>
+                        <td>O banco não compartilha dados com terceiros; qualquer integração futura deve ser documentada aqui</td>
+                    </tr>
+                    <tr>
+                        <td>Eliminação ao fim da retenção</td>
+                        <td>Rotina periódica que elimina ou anonimiza dados vencidos conforme a coluna Retenção do inventário (art. 16)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <section class="entidade relacionamento">
+
+        <h2>Medidas de segurança recomendadas (art. 46)</h2>
+
+        <div class="tabela">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Medida</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Controle de acesso</td>
+                        <td>Usuários do banco com privilégios mínimos (GRANT apenas do necessário); aplicação sem acesso de administrador</td>
+                    </tr>
+                    <tr>
+                        <td>Auditoria</td>
+                        <td>Triggers gravando toda operação em log_auditoria (seção 6)</td>
+                    </tr>
+                    <tr>
+                        <td>Integridade</td>
+                        <td>Constraints NOT NULL, UNIQUE, CHECK e FK impedem dados inválidos ou órfãos</td>
+                    </tr>
+                    <tr>
+                        <td>Cópias de segurança</td>
+                        <td>Backup periódico, criptografado, com teste de restauração</td>
+                    </tr>
+                    <tr>
+                        <td>Criptografia em trânsito</td>
+                        <td>Conexão da aplicação com o banco usando TLS</td>
+                    </tr>
+                    <tr>
+                        <td>Minimização</td>
+                        <td>O modelo guarda somente os dados necessários à finalidade; telefone, e-mail e endereço do cliente são opcionais quando não essenciais</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
 
     <footer>
 
-        Dicionário de Dados Conceitual (Preliminar)<br>
+        Dicionário de Dados Lógico<br>
         JG Construções LTDA
 
     </footer>
@@ -1037,4 +2240,3 @@
 </body>
 
 </html>
-
