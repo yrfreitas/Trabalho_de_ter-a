@@ -1,7 +1,7 @@
 # Entrega 1 — Modelo Conceitual (DER)
 ### Modelagem de um sistema de gestão de informações para uma organização de pequeno porte
 
-Grupo; Clara Victoria, João Pedro de Olviveira, Kalebe Leonardo Cutrim Freitas
+Grupo; Clara Victoria Soares Cardoso, Kalebe Leonardo Cutrim Freitas,Cauê Soares Gomes Alves e Arthur Marques Silva 
 ---
 
 # Modelagem de Banco de Dados para a JG Construções
