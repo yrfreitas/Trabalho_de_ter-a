@@ -668,25 +668,25 @@ Ele está versionado no repositório, em dois arquivos:
 
 *Item de Orçamento e Item de Compra saíram da lista de entidades (revisão 3): quantidade e valor por serviço/material negociado são atributos do relacionamento N:N Orçamento-Serviço e Compra-Material, não entidades associativas próprias — ver "Justificativa Técnica" abaixo.*
 
-- **Cliente** é quem solicita orçamento e, eventualmente, tem uma obra executada — existe isolado porque pode ter mais de um orçamento/obra ao longo do tempo (histórico).
-- **Orçamento** relaciona-se N:N com **Serviço**: um orçamento tem vários serviços orçados, cada um com sua própria quantidade e valor negociado — atributos que ficam no próprio relacionamento, não numa entidade separada.
-- **Serviço** é um catálogo reutilizável: o mesmo serviço (ex.: "pintura interna") aparece em vários orçamentos diferentes, com valor de referência único, mas negociado item a item.
-- **Obra** nasce de um orçamento aprovado e é o eixo em torno do qual giram equipe, compras e pagamentos daquele projeto específico.
-- **Obra_Serviço** existe porque o que foi orçado nem sempre é executado exatamente igual — a obra pode ajustar quantidade e status de execução por serviço.
-- **Funcionário** e **Alocação** são separados pelo mesmo motivo de Cliente/Obra: um funcionário atua em várias obras ao longo do tempo, cada alocação com sua função e período específicos naquela obra.
-- **Fornecedor**, **Compra** e **Material** seguem a mesma lógica do bloco de orçamento: Material é catálogo reutilizável, Compra é o pedido feito a um Fornecedor (para uma Obra ou para estoque geral), e quantidade/valor de cada material naquela compra fica no relacionamento Compra-Material.
-- **Pagamento** é separado da Obra porque uma obra é paga em várias etapas, cada uma com sua própria data, valor e status.
+1 **Cliente** é quem solicita orçamento e, eventualmente, tem uma obra executada — existe isolado porque pode ter mais de um orçamento/obra ao longo do tempo (histórico).
+2 **Orçamento** relaciona-se N:N com **Serviço**: um orçamento tem vários serviços orçados, cada um com sua própria quantidade e valor negociado — atributos que ficam no próprio relacionamento, não numa entidade separada.
+3 **Serviço** é um catálogo reutilizável: o mesmo serviço (ex.: "pintura interna") aparece em vários orçamentos diferentes, com valor de referência único, mas negociado item a item.
+4 **Obra** nasce de um orçamento aprovado e é o eixo em torno do qual giram equipe, compras e pagamentos daquele projeto específico.
+5 **Obra_Serviço** existe porque o que foi orçado nem sempre é executado exatamente igual — a obra pode ajustar quantidade e status de execução por serviço.
+6 **Funcionário** e **Alocação** são separados pelo mesmo motivo de Cliente/Obra: um funcionário atua em várias obras ao longo do tempo, cada alocação com sua função e período específicos naquela obra.
+7 **Fornecedor**, **Compra** e **Material** seguem a mesma lógica do bloco de orçamento: Material é catálogo reutilizável, Compra é o pedido feito a um Fornecedor (para uma Obra ou para estoque geral), e quantidade/valor de cada material naquela compra fica no relacionamento Compra-Material.
+8 **Pagamento** é separado da Obra porque uma obra é paga em várias etapas, cada uma com sua própria data, valor e status.
 
 **Relacionamentos pertinentes:**
 
-- Um Cliente possui vários Orçamentos e várias Obras; um Orçamento/Obra pertence a um único Cliente.
-- Um Orçamento reúne vários Serviços do catálogo (N:N), com quantidade e valor negociado no próprio relacionamento; um Serviço pode aparecer em vários orçamentos.
-- Um Orçamento aprovado origina, no máximo, uma Obra (nem todo Orçamento vira Obra — só o que for aprovado); toda Obra tem exatamente um Orçamento de origem.
-- Uma Obra executa vários Serviços (via Obra_Serviço); um Serviço pode estar em várias obras.
-- Uma Obra recebe várias Alocações; cada Alocação vincula um único Funcionário a uma única Obra.
-- Uma Obra pode gerar várias Compras, mas uma Compra nem sempre está ligada a uma Obra — compra para reposição de estoque geral não tem obra de destino; toda Compra é feita a um único Fornecedor.
-- Uma Compra reúne vários Materiais do catálogo (N:N), com quantidade e valor pago no próprio relacionamento; um Material pode aparecer em várias compras.
-- Uma Obra recebe vários Pagamentos (um por etapa).
+1 Um Cliente possui vários Orçamentos e várias Obras; um Orçamento/Obra pertence a um único Cliente.
+2 Um Orçamento reúne vários Serviços do catálogo (N:N), com quantidade e valor negociado no próprio relacionamento; um Serviço pode aparecer em vários orçamentos.
+3 Um Orçamento aprovado origina, no máximo, uma Obra (nem todo Orçamento vira Obra — só o que for aprovado); toda Obra tem exatamente um Orçamento de origem.
+4 Uma Obra executa vários Serviços (via Obra_Serviço); um Serviço pode estar em várias obras.
+5 Uma Obra recebe várias Alocações; cada Alocação vincula um único Funcionário a uma única Obra.
+6 Uma Obra pode gerar várias Compras, mas uma Compra nem sempre está ligada a uma Obra — compra para reposição de estoque geral não tem obra de destino; toda Compra é feita a um único Fornecedor.
+7 Uma Compra reúne vários Materiais do catálogo (N:N), com quantidade e valor pago no próprio relacionamento; um Material pode aparecer em várias compras.
+8 Uma Obra recebe vários Pagamentos (um por etapa).
 
 **Restrições e políticas organizacionais aplicadas ao modelo:**
 - Uma Obra só existe vinculada a um Orçamento aprovado — não há Obra sem Orçamento de origem.
