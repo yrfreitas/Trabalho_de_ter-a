@@ -24,7 +24,7 @@ A delimitação desta primeira entrega é o **núcleo do ciclo orçamento → ob
 
 - **Nome e natureza da organização:** JG Construções — empresa privada com fins lucrativos, do ramo de reformas e construção civil de pequeno porte.
 - **Contexto e porte:** *empresa registrada como ME (microempresa) junto à Receita Federal, mas que opera atualmente com cerca de 20 ou mais pessoas envolvidas entre equipe efetiva e prestadores/subcontratados nas obras.
-- **Problemas e necessidades identificados:** antes do sistema proposto, orçamentos, obras, alocação de equipe e compra de material eram controlados de forma manual/dispersa, sem um cadastro único de clientes nem histórico organizado de qual funcionário trabalhou em qual obra, ou quanto foi gasto em material por obra.
+- **Problemas e necessidades identificados:** A JG Construções executa obras com vários serviços, equipes e pagamentos parcelados. Sem um sistema que relacione obras, orçamentos e pagamentos, a empresa depende de memória e de anotações soltas para saber quanto cada cliente já pagou e quanto ainda deve.
 - **Justificativa da escolha:**  A empresa foi escolhida por apresentar uma necessidade de melhorar a organização de informações sobre clientes, serviços e orçamentos. O desenvolvimento de um sistema pode facilitar essas atividades, tornando o trabalho mais rápido e organizado.
 - **Evidências da organização:** Nome e natureza da organização: JG Construções LTDA
  (nome fantasia: JG Construções), Sociedade Empresária Limitada, com fins lucrativos.
