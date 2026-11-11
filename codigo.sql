@@ -365,8 +365,17 @@ LEFT JOIN funcionario f ON f.id_funcionario = os.id_funcionario
 LEFT JOIN prestador   p ON p.id_prestador   = os.id_prestador
 ORDER BY ob.id_obra, os.id_obra_servico;
 
+-- Cadastrar funcionários e prestadores (RF05)
 
--- Consultar orçamentos com cliente e responsável (RF06)
+SELECT 'Funcionário' AS vinculo, nome, cpf, cargo AS funcao_ou_especialidade,
+       telefone, email, status
+FROM funcionario
+UNION ALL
+SELECT 'Prestador', nome, cpf, especialidade, telefone, email, NULL
+FROM prestador
+ORDER BY vinculo, nome;
+
+-- Consultar orçamentos com cliente e responsável  (RF06)
 
 SELECT o.id_orcamento, c.nome AS cliente, ob.id_obra,
        f.nome AS responsavel, o.data_emissao, o.valor_total, o.status
