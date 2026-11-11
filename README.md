@@ -116,6 +116,33 @@ Cada atributo virou uma coluna com tipo SQL mantido do DER (`int`, `varchar(n)`,
 ---
 
 
+## Processo de Normalização
+ 
+#### 1FN — atributos atômicos e sem grupos repetitivos
+ 
+- **Problema:** `OBRA.tipo_servico` armazenava o tipo do serviço em texto; uma obra com pintura e elétrica exigiria "Pintura, Elétrica" na mesma célula (valor multivalorado) ou linhas duplicadas.
+- **Solução:** o vínculo obra–serviço foi para `obra_servico`, uma linha por serviço.
+- **Demais atributos:** `telefone`, `email`, `cpf_cnpj` guardam um único valor. `endereco` foi mantido como texto único por decisão de escopo (não há consulta por rua/cidade nos requisitos); se RF08/RF09 passarem a filtrar por cidade, deve ser decomposto.
+- **Por que foi necessária:** sem ela, RF03/RF04 e a consulta por serviço (RF08) seriam inconsistentes.
+#### 2FN — sem dependência parcial da chave
+ 
+Só importa onde há chave composta ou conceito N:N:
+ 
+- `tempo_estimado` estava em `SERVICO`, mas varia por obra → dependia de (obra, serviço). Movido para `obra_servico`.
+- `quantidade` de material dependia de (obra, material), não do material sozinho. Colocada em `obra_material`.
+- `data_execucao`, `valor_contratado` e `tempo_real` dependem do serviço naquela obra → `obra_servico`.
+- Em `alocacao_*`, os atributos (`data_fim`, `funcao`) dependem da chave composta inteira.
+- **Por que foi necessária:** evitar que o mesmo serviço/material tivesse um único tempo/quantidade global, o que tornaria impossível orçar obras diferentes.
+#### 3FN — sem dependência transitiva
+ 
+- `ORCAMENTO.id_cliente`: `id_orcamento → id_obra → id_cliente`. Removido; o cliente é obtido por JOIN.
+- `OBRA.tipo_servico`: determinado por `id_servico → tipo`. Removido (ver 1FN).
+- Atributos do serviço (`descricao`, `tipo`, `valor_padrao`) ficam só em `servico`; `obra_servico` guarda apenas o `id_servico`.
+- Dados de funcionário/prestador (nome, cargo, especialidade) ficam só nas suas tabelas; `obra_servico` guarda o id.
+- `orcamento.valor_total` e `pagamento.valor` não são recalculados de outras tabelas: são valores acordados/transacionados em uma data (um "retrato" financeiro), portanto não configuram dependência transitiva.
+- **Por que foi necessária:** reduzir risco de anomalias de atualização (ex.: trocar o cliente da obra e esquecer o orçamento).
+---
+
 #### Requisitos Funcionais
 
 RF01 – Cadastrar clientes
