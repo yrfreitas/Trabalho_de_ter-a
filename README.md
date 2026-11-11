@@ -50,43 +50,50 @@ Ao revisar o DER, foram encontradas inconsistências entre o desenho dos relacio
 | 9 | `MATERIAL` tinha `id_obra` (um material em uma obra só) e o desenho o ligava a Orçamento/Hidráulica. | `MATERIAL` vira catálogo; `OBRA_MATERIAL` (N:N) registra quantidade por obra e, opcionalmente, o serviço que o utilizou. Adicionado `custo_unitario`. | O mesmo material é usado em várias obras (2FN); habilita análise de custo. |
 ---
 
-### Processos de Negócio
-
-
-**Principais processos mapeados:**
-1. *Cadastro de cliente* — nome, CPF/CNPJ, telefone, e-mail e endereço.
-2. *Cadastro de obras*— registro de uma obra com endereço, cliente responsável, tipo de serviço e período de execução.
-3. *Cadastro de serviços* — registro do catálogo de serviços oferecidos (pintura, elétrica, hidráulica, acabamento, manutenção etc.).
-4. *Orçamento* — a partir de um catálogo de serviços (com valor de referência), monta-se um orçamento para o cliente, item a item, com validade e valor total.
-5. *Execução e acompanhamento da obra* — controle do status (planejada, em andamento, pausada, concluída).
-6. *Registro de pagamentos* — lançamento dos pagamentos referentes a serviços/obras.
-
-**Fluxogramas:**
-
-**1. Cadastro de cliente**
-
-![Fluxograma - Cadastro de Cliente](fluxograma.cadastrado-cliente.jpeg)
-
-**2. Comercial (orçamento)**
-
-![Fluxograma - Comercial](fluxograma.comercial.jpeg)
-
-**3. Execução da obra**
-
-![Fluxograma - Execução](fluxograma.execucao.jpeg)
-
-Fluxo principal, em texto, para orientar o desenho do fluxograma:
-
-```
-Cliente pede orçamento
-   → Orçamento é montado (itens do catálogo de serviços, com valor)
-      → Cliente aprova o orçamento
-         → Obra é aberta (endereço, escopo, prazo)
-            ├─ Equipe é alocada na obra (funcionário + função + período)
-            ├─ Material é comprado de fornecedor(es) para a obra
-            ├─ Serviços orçados são executados na obra
-            └─ Pagamento é recebido por etapa, até a conclusão
-```
+## Conversão do Modelo Conceitual para o Modelo Lógico
+ 
+#### 1.2.1 Entidades → Tabelas
+ 
+| Entidade (DER) | Tabela (lógico) | Observação |
+|---|---|---|
+| CLIENTE | `cliente` | Conversão direta. |
+| OBRA | `obra` | Conversão direta (sem `tipo_servico`). |
+| SERVIÇO | `servico` | Catálogo de serviços. |
+| FUNCIONÁRIO | `funcionario` | Sem `id_obra`. |
+| PRESTADOR | `prestador` | Sem `id_obra`. |
+| ORÇAMENTO | `orcamento` | Sem `id_cliente`; ganha `id_funcionario`. |
+| PAGAMENTO | `pagamento` | Conversão direta. |
+| MATERIAL | `material` | Vira catálogo. |
+| PINTURA, ELÉTRICA, HIDRÁULICA, ACABAMENTO | `obra_servico` | Uma só tabela; o tipo vem de `servico.tipo`. |
+| *(novas, de relacionamentos N:N)* | `alocacao_funcionario`, `alocacao_prestador`, `obra_material` | Tabelas associativas novas. |
+ 
+**Total: 12 tabelas.**
+ 
+#### 1.2.2 Atributos → Colunas
+ 
+Cada atributo virou uma coluna com tipo SQL mantido do DER (`int`, `varchar(n)`, `decimal(10,2)`, `date`). Alterações:
+ 
+- Chaves `id_*` passam a ser `INT` autoincrementais (identity).
+- `servico.tempo_padrao` e `obra_servico.tempo_estimado`/`tempo_real` são em **horas**.
+- `responsavel` (varchar) foi substituído por colunas FK.
+- Atributos de data e status ganharam `DEFAULT` e `CHECK` (ver [1.5](#15-justificativas-técnicas-das-decisões)).
+- Novas colunas: `obra_servico.tempo_real`, `obra_servico.valor_contratado`, `material.custo_unitario`, `orcamento.id_funcionario`.
+#### 1.2.3 Relacionamentos → Chaves e 1.2.4 Cardinalidades
+ 
+| Relacionamento | Cardinalidade | Como foi traduzido |
+|---|---|---|
+| Cliente possui Obra | 1:N | FK `obra.id_cliente → cliente`. |
+| Obra tem Serviço (é de) | N:N | Tabela associativa `obra_servico` com FKs para `obra` e `servico`. |
+| Obra possui Funcionário | N:N | Associativa `alocacao_funcionario` (PK composta `id_obra` + `id_funcionario` + `data_inicio`). |
+| Obra possui Prestador | N:N | Associativa `alocacao_prestador` (PK composta `id_obra` + `id_prestador` + `data_inicio`). |
+| Obra tem Orçamento | 1:N | FK `orcamento.id_obra → obra`. |
+| Funcionário elabora Orçamento | 1:N | FK `orcamento.id_funcionario → funcionario`. |
+| Orçamento possui Pagamento | 1:N | FK `pagamento.id_orcamento → orcamento`. |
+| Funcionário / Prestador realiza Serviço da obra | 1:N (cada) | FKs opcionais `obra_servico.id_funcionario` e `obra_servico.id_prestador`. |
+| Obra utiliza Material | N:N | Associativa `obra_material` (com quantidade). |
+| Serviço da obra utiliza Material | 1:N (opcional) | FK nula `obra_material.id_obra_servico`. |
+ 
+> Não há relacionamentos 1:1 no modelo final. Os **4 relacionamentos N:N** do DER (obra–serviço, obra–funcionário, obra–prestador e obra–material) viraram tabelas associativas; os atributos do relacionamento (quantidade, datas, tempos) ficaram nelas.
 
 ---
 
