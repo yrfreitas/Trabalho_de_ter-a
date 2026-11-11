@@ -30,7 +30,9 @@ Situação cadastral: Ativa (desde 03/11/2025)
 Endereço: R. Alberta Hunter, 761, Vila Brasil, São Paulo – SP, CEP 08.210-681
 Contato: (11) 8161-3422 · jovaldo.santos@hotmail.com
 
+### Diagrama Modelo Conceitual (DER)
 
+![DER - JG Construções](DER.png)
 
 ---
 
@@ -511,9 +513,6 @@ Ele está versionado no repositório, em dois arquivos:
 
 ---
 
-### Diagrama Modelo Conceitual (DER)
-
-![DER - JG Construções](DER.png)
 
 11 entidades, com as cardinalidades de cada relacionamento: Cliente 1:N Orçamento; Cliente 1:N Obra; Orçamento N:N Serviço (com quantidade/valor no relacionamento); Orçamento 1:0,1 Obra (todo Orçamento aprovado gera no máximo uma Obra; toda Obra vem de exatamente um Orçamento); Serviço 1:N Obra_Serviço; Obra 1:N Obra_Serviço, 1:N Alocação, 1:N Pagamento; Obra 0,1:N Compra (compra pode não ter obra — estoque geral); Funcionário 1:N Alocação; Fornecedor 1:N Compra; Compra N:N Material (com quantidade/valor no relacionamento).
 
