@@ -192,6 +192,70 @@ Em geral: dados financeiros e históricos usam `RESTRICT` (atende RF01 — exclu
 6. **Preparado para crescimento:** novos tipos de serviço, formas de pagamento e status exigem só inserção/ajuste de `CHECK`, sem mudar a estrutura.
 ---
 
+ ## Proposta de Arquitetura Analítica para BI e IA
+ 
+#### Informações estratégicas extraíveis
+ 
+- Quais tipos de serviço geram mais receita e margem.
+- Onde há atrasos: por tipo de serviço, equipe, prestador ou cliente.
+- Gargalos de capacidade (profissionais sobrealocados ou ociosos).
+- Comportamento de pagamento e risco de inadimplência.
+- Consumo e custo de materiais por obra/serviço.
+- Qualidade das estimativas (previsto × realizado).
+- Perfil e recorrência de clientes.
+#### KPIs propostos
+ 
+| KPI | Fórmula (base) |
+|---|---|
+| Obras em andamento / concluídas / atrasadas | `COUNT(obra)` por `status` e `data_fim` vs. data atual |
+| Prazo médio de execução | `AVG(data_fim − data_inicio)` |
+| Desvio de prazo por serviço | `(tempo_real − tempo_estimado) / tempo_estimado` em `obra_servico` |
+| Receita por tipo de serviço | `SUM(valor_contratado)` agrupado por `servico.tipo` |
+| Ticket médio por orçamento aprovado | `AVG(orcamento.valor_total)` dos orçamentos com status `Aprovado` (se uma obra tiver vários, agregar por `id_obra` antes da média para obter o ticket por obra) |
+| Taxa de aprovação de orçamentos | aprovados ÷ emitidos |
+| Taxa de inadimplência | `SUM(valor)` com status `Atrasado` ÷ total a receber |
+| Prazo médio de recebimento | `AVG(pagamento.data_pagamento − orcamento.data_emissao)`, com junção de `pagamento` a `orcamento` |
+| Custo de materiais / margem bruta sobre materiais | `SUM(quantidade × custo_unitario)`; `valor_contratado − custo_materiais` (não inclui mão de obra) |
+| Taxa de ocupação da equipe | obras/serviços ativos por funcionário e prestador |
+| Retenção de clientes | clientes com 2+ obras ÷ total de clientes |
+ 
+#### Potencial para BI
+ 
+O modelo normalizado alimenta, via ETL, um **esquema estrela**:
+ 
+- **Fatos:**
+  - `fato_execucao_servico` (origem `obra_servico`: valor, tempo estimado/real, desvio)
+  - `fato_pagamento` (origem `pagamento`)
+  - `fato_consumo_material` (origem `obra_material`)
+- **Dimensões:** `dim_cliente`, `dim_obra`, `dim_servico`, `dim_profissional` (funcionário/prestador), `dim_material`, `dim_tempo`.
+**Painéis sugeridos:**
+ 
+1. **Visão executiva:** receita, margem, obras ativas, inadimplência.
+2. **Operação:** cronograma, atrasos, alocação da equipe.
+3. **Financeiro:** orçado × contratado × recebido, aging de recebíveis.
+4. **Suprimentos:** consumo e custo de materiais.
+5. **Comercial:** funil de orçamentos e ticket médio.
+Isso responde diretamente RF08 (consultas), RF09 (relatórios) e RF10 (acompanhamento).
+ 
+#### Aplicações analíticas e de IA
+ 
+| Aplicação | Descrição |
+|---|---|
+| Previsão de prazo e custo (regressão) | Usa tipo de serviço, tempo padrão, histórico de desvios e equipe para prever duração e custo de novas obras. |
+| Apoio à precificação | Sugerir `valor_contratado` com base em obras similares. |
+| Risco de inadimplência (classificação) | Prevê atraso de pagamento por forma de pagamento, valor e histórico do cliente. |
+| Recomendação de serviços (cross-sell) | Regras de associação (ex.: clientes que contratam pintura frequentemente contratam acabamento). |
+| Alocação inteligente | Recomendar profissional por especialidade, disponibilidade e desempenho. |
+| Previsão de demanda de materiais | Séries temporais para antecipar compras. |
+| Detecção de anomalias | Quantidades de material ou custos fora do padrão. |
+ 
+> **Requisito de dados:** o modelo já armazena o realizado (`tempo_real`, `data_fim`, `data_pagamento`), necessário para treinar os modelos acima. Recomenda-se que o sistema exija o registro desses campos ao concluir cada obra/serviço. Dados pessoais devem ser anonimizados nas bases analíticas (LGPD).
+ 
+---
+ 
+## 2. Modelo Lógico Relacional
+ 
+O modelo lógico completo (tabelas, colunas, PKs, FKs, restrições, cardinalidades e script SQL) está no documento separado [`modelo_logico_relacional.md`](./modelo_logico_relacional.md), disponível neste repositório.
 
 #### Requisitos Funcionais
 
