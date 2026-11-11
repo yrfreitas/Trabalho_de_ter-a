@@ -727,15 +727,23 @@ Por fim, **Pagamento foi modelado por etapa, vinculado à Obra**, e não como um
 
 ## Conclusão
 
-Fechando essa primeira entrega, o que a gente modelou foi basicamente o caminho que um cliente da JG Construções percorre até virar uma obra em andamento: pede orçamento, aprova, a obra é aberta, entra equipe, entra material comprado de fornecedor, e o pagamento vai saindo por etapa. Não modelamos a empresa inteira (isso o próprio escopo já deixa claro lá no início), só esse núcleo, mas mesmo assim já deu trabalho — o dicionário de dados sozinho tem 13 entidades.
-
-O maior aprendizado, sinceramente, não foi desenhar o diagrama em si, foi perceber que "parecer certo" e "estar certo" são coisas diferentes. Na primeira versão do DER a gente tinha colocado tanto o cliente quanto o orçamento como chave estrangeira dentro de Obra — visualmente fazia sentido (afinal a obra "tem" um cliente), mas isso é justamente o tipo de redundância que dá problema depois: se um dia alguém trocasse o cliente do orçamento sem lembrar de trocar também na obra, o banco ficaria com dois donos diferentes pra mesma obra. Achamos esse tipo de erro só quando fomos confrontar o diagrama com as regras de negócio escritas, campo por campo — o que reforça que o dicionário de dados não é só burocracia do trabalho, ele serve pra pegar exatamente esse tipo de furo.
-
-Também mudamos a cardinalidade entre Orçamento e Obra (estava 1:N, o certo é uma obra vir de no máximo um orçamento) e tiramos uma ligação direta entre Compra e Material que não deveria existir, já que o Item_Compra sozinho já resolve essa relação. Nenhuma dessas correções muda o que o sistema faz na prática — muda é a garantia de que o banco não vai deixar entrar um dado contraditório.
-
-Do levantamento com a organização, o que mais chamou atenção foi como regra "óbvia" pra quem trabalha lá (tipo: às vezes se compra material sem saber ainda pra qual obra vai) só aparece se a gente perguntar especificamente, porque ninguém pensa nisso como "regra", é só o jeito que as coisas funcionam. Isso é diferente de fazer exercício de sala de aula com enunciado fechado.
-
-Pra próxima etapa, o que falta aprofundar é justamente o que ficou de fora do recorte: gateway de pagamento (hoje é só um campo de texto dizendo a forma), regra de estoque mínimo de material, e principalmente as permissões de acesso por tipo de usuário, que no RNF01 a gente só descreveu por cima. Também queremos revisar com mais calma se toda obra realmente precisa de orçamento formal antes de começar — na prática pode ser que exista obra de emergência que começa antes do orçamento estar fechado, e isso mudaria a cardinalidade que definimos aqui.
+### Síntese
+ 
+Este trabalho revisou e consolidou o modelo de dados do Sistema de Gestão de Obras e Serviços da **JG Construções LTDA**. A revisão do DER da Entrega 1 identificou inconsistências entre os relacionamentos desenhados, as chaves estrangeiras declaradas e os requisitos (RF01–RF10). Nove ajustes foram aplicados. Os principais foram:
+ 
+- a criação da entidade associativa `obra_servico`, que substituiu o atributo multivalorado `tipo_servico` e as quatro tabelas idênticas por especialidade (pintura, elétrica, hidráulica e acabamento);
+- a transformação dos quatro relacionamentos N:N (obra–serviço, obra–funcionário, obra–prestador e obra–material) em tabelas associativas;
+- a remoção de redundâncias, como `orcamento.id_cliente`;
+- a transformação de `material` e `servico` em catálogos, separados das suas instâncias por obra.
+O resultado é um modelo lógico com **12 tabelas**, sem relacionamentos 1:1 e normalizado até a **3FN**. Ele tem chaves, políticas de exclusão (`RESTRICT`/`CASCADE`) e restrições (`UNIQUE`, `NOT NULL`, `CHECK`, `DEFAULT`) definidas e justificadas.
+ 
+### Contribuições
+ 
+- **Integridade e rastreabilidade:** o executor de cada serviço passou a ser uma chave estrangeira (funcionário ou prestador), no lugar de texto livre, e o histórico financeiro é preservado por políticas `RESTRICT`.
+- **Aderência à operação real:** o modelo reflete o funcionamento da empresa, inclusive os serviços elétricos executados por prestadores subcontratados, que não constam entre os CNAEs da organização.
+- **Extensibilidade:** novos tipos de serviço, formas de pagamento e status exigem apenas inserção de linhas ou ajuste de `CHECK`, sem alteração estrutural.
+- **Base analítica:** o modelo já registra o previsto e o realizado (`tempo_estimado`/`tempo_real`, `data_fim`, `data_pagamento`). Com isso, sustenta KPIs, um esquema estrela para BI e aplicações de IA, como previsão de prazo e custo e risco de inadimplência.
+- **Privacidade:** os dados pessoais ficam concentrados em `cliente`, `funcionario` e `prestador`, o que facilita o controle de acesso e a anonimização exigidos pela LGPD.
 
 ## Referências Bibliográficas
 
