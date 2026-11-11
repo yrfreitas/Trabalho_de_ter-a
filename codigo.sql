@@ -332,41 +332,63 @@ UNION ALL SELECT 'obra_material', COUNT(*) FROM obra_material;
 Consultas 
 ---------------------------------------------------
 
+-- Consultar clientes cadastrados (RF01)
+
+SELECT id_cliente, nome, cpf_cnpj, telefone, email, endereco, data_cadastro
+FROM cliente
+ORDER BY nome;
+
+-- Consultar obras com cliente e prazos (RF02)
+
+SELECT ob.id_obra, c.nome AS cliente, ob.endereco, ob.status,
+       ob.data_inicio, ob.data_prevista_fim, ob.data_fim
+FROM obra ob
+JOIN cliente c ON c.id_cliente = ob.id_cliente
+ORDER BY ob.id_obra;
+
+-- Catálogo de serviços por categoria (RF03)
+
+SELECT id_servico, descricao, tipo, valor_padrao, tempo_padrao
+FROM servico
+ORDER BY tipo, descricao;
+
+-- Serviços de cada obra, com cliente, executor e valor (RF04)
+
+SELECT ob.id_obra, c.nome AS cliente, s.descricao, s.tipo,
+       COALESCE(f.nome, p.nome) AS executor,
+       os.valor_contratado, os.data_execucao
+FROM obra_servico os
+JOIN obra ob     ON ob.id_obra   = os.id_obra
+JOIN cliente c   ON c.id_cliente = ob.id_cliente
+JOIN servico s   ON s.id_servico = os.id_servico
+LEFT JOIN funcionario f ON f.id_funcionario = os.id_funcionario
+LEFT JOIN prestador   p ON p.id_prestador   = os.id_prestador
+ORDER BY ob.id_obra, os.id_obra_servico;
+
+
+-- Consultar orçamentos com cliente e responsável (RF06)
+
+SELECT o.id_orcamento, c.nome AS cliente, ob.id_obra,
+       f.nome AS responsavel, o.data_emissao, o.valor_total, o.status
+FROM orcamento o
+JOIN obra ob       ON ob.id_obra        = o.id_obra
+JOIN cliente c     ON c.id_cliente      = ob.id_cliente
+JOIN funcionario f ON f.id_funcionario  = o.id_funcionario
+ORDER BY o.data_emissao;
+
 
 -- Consultar pagamentos (RF07)
 
-SELECT
-    cliente.nome AS cliente,
-    orcamento.id_orcamento,
-    pagamento.valor,
-    pagamento.forma_pagamento,
-    pagamento.status
-FROM cliente
-INNER JOIN obra
-    ON cliente.id_cliente = obra.id_cliente
-INNER JOIN orcamento
-    ON obra.id_obra = orcamento.id_obra
-INNER JOIN pagamento
-    ON orcamento.id_orcamento = pagamento.id_orcamento
-WHERE pagamento.status IN ('Pendente', 'Atrasado');
+SELECT p.id_pagamento, c.nome AS cliente, o.id_orcamento, p.valor, p.forma_pagamento, p.data_pagamento
+FROM pagamento p
+JOIN orcamento o ON o.id_orcamento = p.id_orcamento
+JOIN obra ob     ON ob.id_obra     = o.id_obra
+JOIN cliente c   ON c.id_cliente   = ob.id_cliente
+WHERE p.status = 'Pago'
+ORDER BY p.data_pagamento;
 
---Gerencial: saldo devedor por cliente
 
-SELECT c.nome AS cliente, ob.id_obra, o.id_orcamento,
-       o.valor_total AS valor_orcado,
-       COALESCE(SUM(CASE WHEN p.status = 'Pago' THEN p.valor END), 0) AS total_pago,
-       o.valor_total - COALESCE(SUM(CASE WHEN p.status = 'Pago' THEN p.valor END), 0) AS saldo_devedor,
-       COALESCE(SUM(CASE WHEN p.status = 'Atrasado' THEN p.valor END), 0) AS valor_em_atraso
-FROM orcamento o
-JOIN obra ob     ON ob.id_obra   = o.id_obra
-JOIN cliente c   ON c.id_cliente = ob.id_cliente
-LEFT JOIN pagamento p ON p.id_orcamento = o.id_orcamento
-WHERE o.status = 'Aprovado'
-GROUP BY c.nome, ob.id_obra, o.id_orcamento, o.valor_total
-HAVING saldo_devedor > 0
-ORDER BY valor_em_atraso DESC, saldo_devedor DESC;
-
---Acompanhamento de valores 
+--Acompanhamento de valores (RF07)
 
 SELECT
     o.id_orcamento,
@@ -390,23 +412,28 @@ LEFT JOIN pagamento p
     ON o.id_orcamento = p.id_orcamento
 GROUP BY o.id_orcamento, o.valor_total;
 
+--Gerar relatorios (RF09)
 
--- Auditoria: orçamento aprovado cujo valor_total difere da soma dos serviços da obra
+SELECT ob.id_obra, c.nome AS cliente,
+       COUNT(os.id_obra_servico) AS qtd_servicos,
+       COALESCE(SUM(os.valor_contratado), 0) AS valor_total_servicos
+FROM obra ob
+JOIN cliente c ON c.id_cliente = ob.id_cliente
+LEFT JOIN obra_servico os ON os.id_obra = ob.id_obra
+GROUP BY ob.id_obra, c.nome
+ORDER BY ob.id_obra;
 
-SELECT o.id_orcamento, o.id_obra, o.valor_total,
-       COALESCE(SUM(os.valor_contratado), 0) AS soma_servicos,
-       o.valor_total - COALESCE(SUM(os.valor_contratado), 0) AS diferenca
-FROM orcamento o
-LEFT JOIN obra_servico os ON os.id_obra = o.id_obra
-WHERE o.status = 'Aprovado'
-GROUP BY o.id_orcamento, o.id_obra, o.valor_total
-HAVING diferenca <> 0;
+-- Controlar andamento das obras (RF10)
 
+SELECT ob.id_obra, c.nome AS cliente, ob.status, ob.data_prevista_fim,
+       COUNT(os.id_obra_servico)                AS qtd_servicos,
+       SUM(os.tempo_real IS NOT NULL)           AS servicos_com_horas_apuradas,
+       SUM(os.tempo_estimado)                   AS horas_previstas,
+       SUM(os.tempo_real)                       AS horas_reais
+FROM obra ob
+JOIN cliente c ON c.id_cliente = ob.id_cliente
+LEFT JOIN obra_servico os ON os.id_obra = ob.id_obra
+WHERE ob.status IN ('Em andamento','Pausada')
+GROUP BY ob.id_obra, c.nome, ob.status, ob.data_prevista_fim
+ORDER BY ob.id_obra;
 
--- Auditoria: pagamentos 'Pago' acima do valor do orçamento
-
-SELECT o.id_orcamento, o.valor_total, SUM(p.valor) AS total_pago
-FROM orcamento o
-JOIN pagamento p ON p.id_orcamento = o.id_orcamento AND p.status = 'Pago'
-GROUP BY o.id_orcamento, o.valor_total
-HAVING total_pago > o.valor_total;
