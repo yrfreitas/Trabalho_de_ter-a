@@ -96,6 +96,25 @@ Cada atributo virou uma coluna com tipo SQL mantido do DER (`int`, `varchar(n)`,
 > Não há relacionamentos 1:1 no modelo final. Os **4 relacionamentos N:N** do DER (obra–serviço, obra–funcionário, obra–prestador e obra–material) viraram tabelas associativas; os atributos do relacionamento (quantidade, datas, tempos) ficaram nelas.
 
 ---
+## Chaves Primárias e Estrangeiras
+ 
+| Tabela | Chave primária | Chaves estrangeiras |
+|---|---|---|
+| `cliente` | `id_cliente` | — |
+| `obra` | `id_obra` | `id_cliente → cliente` |
+| `servico` | `id_servico` | — |
+| `obra_servico` | `id_obra_servico` | `id_obra → obra`; `id_servico → servico`; `id_funcionario → funcionario` (nula); `id_prestador → prestador` (nula) |
+| `funcionario` | `id_funcionario` | — |
+| `prestador` | `id_prestador` | — |
+| `alocacao_funcionario` | (`id_obra`, `id_funcionario`, `data_inicio`) | `id_obra → obra`; `id_funcionario → funcionario` |
+| `alocacao_prestador` | (`id_obra`, `id_prestador`, `data_inicio`) | `id_obra → obra`; `id_prestador → prestador` |
+| `orcamento` | `id_orcamento` | `id_obra → obra`; `id_funcionario → funcionario` |
+| `pagamento` | `id_pagamento` | `id_orcamento → orcamento` |
+| `material` | `id_material` | — |
+| `obra_material` | `id_obra_material` | `id_obra → obra`; `id_material → material`; `id_obra_servico → obra_servico` (nula) |
+ 
+---
+
 
 #### Requisitos Funcionais
 
