@@ -662,47 +662,6 @@ Ele está versionado no repositório, em dois arquivos:
 
 ---
 
-### Modelagem Conceitual (Entidades, Atributos, Relacionamentos)
-
-**Entidades reconhecidas:** Cliente, Orçamento, Serviço, Obra, Obra_Serviço, Funcionário, Alocação, Fornecedor, Compra, Material, Pagamento.
-
-*Item de Orçamento e Item de Compra saíram da lista de entidades (revisão 3): quantidade e valor por serviço/material negociado são atributos do relacionamento N:N Orçamento-Serviço e Compra-Material, não entidades associativas próprias — ver "Justificativa Técnica" abaixo.*
-
-1 **Cliente** é quem solicita orçamento e, eventualmente, tem uma obra executada — existe isolado porque pode ter mais de um orçamento/obra ao longo do tempo (histórico).
-2 **Orçamento** relaciona-se N:N com **Serviço**: um orçamento tem vários serviços orçados, cada um com sua própria quantidade e valor negociado — atributos que ficam no próprio relacionamento, não numa entidade separada.
-3 **Serviço** é um catálogo reutilizável: o mesmo serviço (ex.: "pintura interna") aparece em vários orçamentos diferentes, com valor de referência único, mas negociado item a item.
-4 **Obra** nasce de um orçamento aprovado e é o eixo em torno do qual giram equipe, compras e pagamentos daquele projeto específico.
-5 **Obra_Serviço** existe porque o que foi orçado nem sempre é executado exatamente igual — a obra pode ajustar quantidade e status de execução por serviço.
-6 **Funcionário** e **Alocação** são separados pelo mesmo motivo de Cliente/Obra: um funcionário atua em várias obras ao longo do tempo, cada alocação com sua função e período específicos naquela obra.
-7 **Fornecedor**, **Compra** e **Material** seguem a mesma lógica do bloco de orçamento: Material é catálogo reutilizável, Compra é o pedido feito a um Fornecedor (para uma Obra ou para estoque geral), e quantidade/valor de cada material naquela compra fica no relacionamento Compra-Material.
-8 **Pagamento** é separado da Obra porque uma obra é paga em várias etapas, cada uma com sua própria data, valor e status.
-
-**Relacionamentos pertinentes:**
-
-1 Um Cliente possui vários Orçamentos e várias Obras; um Orçamento/Obra pertence a um único Cliente.
-2 Um Orçamento reúne vários Serviços do catálogo (N:N), com quantidade e valor negociado no próprio relacionamento; um Serviço pode aparecer em vários orçamentos.
-3 Um Orçamento aprovado origina, no máximo, uma Obra (nem todo Orçamento vira Obra — só o que for aprovado); toda Obra tem exatamente um Orçamento de origem.
-4 Uma Obra executa vários Serviços (via Obra_Serviço); um Serviço pode estar em várias obras.
-5 Uma Obra recebe várias Alocações; cada Alocação vincula um único Funcionário a uma única Obra.
-6 Uma Obra pode gerar várias Compras, mas uma Compra nem sempre está ligada a uma Obra — compra para reposição de estoque geral não tem obra de destino; toda Compra é feita a um único Fornecedor.
-7 Uma Compra reúne vários Materiais do catálogo (N:N), com quantidade e valor pago no próprio relacionamento; um Material pode aparecer em várias compras.
-8 Uma Obra recebe vários Pagamentos (um por etapa).
-
-**Restrições e políticas organizacionais aplicadas ao modelo:**
-- Uma Obra só existe vinculada a um Orçamento aprovado — não há Obra sem Orçamento de origem.
-- O valor total de um Orçamento e de uma Compra são sempre derivados da soma dos itens do relacionamento (quantidade × valor_unitario de cada Serviço/Material), nunca digitados diretamente.
-
----
-
-
-11 entidades, com as cardinalidades de cada relacionamento: Cliente 1:N Orçamento; Cliente 1:N Obra; Orçamento N:N Serviço (com quantidade/valor no relacionamento); Orçamento 1:0,1 Obra (todo Orçamento aprovado gera no máximo uma Obra; toda Obra vem de exatamente um Orçamento); Serviço 1:N Obra_Serviço; Obra 1:N Obra_Serviço, 1:N Alocação, 1:N Pagamento; Obra 0,1:N Compra (compra pode não ter obra — estoque geral); Funcionário 1:N Alocação; Fornecedor 1:N Compra; Compra N:N Material (com quantidade/valor no relacionamento).
-
-*(Revisão 2: durante a conferência do modelo, percebemos duas inconsistências na primeira versão do diagrama — a relação Orçamento→Obra estava desenhada como 1:N, quando pela própria regra de negócio uma Obra só pode vir de UM Orçamento aprovado, e havia uma ligação direta entre Compra e Material que duplicava o que o Item_Compra já resolvia. As duas foram corrigidas.)*
-
-*(Revisão 3: Item_Orçamento e Item_Compra saíram como entidades associativas próprias. Notação de Chen correta pra um N:N com atributo (quantidade, valor_unitario, valor_item) é o atributo pendurado no PRÓPRIO losango do relacionamento, não uma entidade nova com dois losangos grudados nela — o erro anterior tinha, na prática, dois relacionamentos saindo da mesma caixa, o que não é uma leitura válida do diagrama. A tabela física (junção com essas colunas) continua existindo do mesmo jeito; o que mudou foi só a representação conceitual.)*
-
----
-
 ### Justificativa Técnica
 
 A decisão central do modelo foi **separar o que foi orçado (relacionamento Orçamento-Serviço) do que foi de fato executado (Obra_Serviço)**, em vez de assumir que a obra sempre executa exatamente o que constava no orçamento. Na prática de uma obra, quantidade e escopo de um serviço podem mudar no meio do caminho (mais metros quadrados do que o previsto, um serviço cancelado). Um único registro que misturasse "orçado" e "executado" perderia essa diferença — e é justamente essa diferença que a empresa precisa para saber se está ganhando ou perdendo dinheiro numa obra em relação ao que foi vendido ao cliente.
