@@ -1,7 +1,10 @@
 # Entrega 2 — Relatorio Tecnico Final 
 ### Modelagem de um sistema de gestão de informações para uma organização de pequeno porte
 
-Grupo; Clara Victoria Soares Cardoso, Kalebe Leonardo Cutrim Freitas,Cauê Soares Gomes Alves e Arthur Marques Silva 
+Grupo; Clara Victoria Soares Cardoso, RGM: 47015225
+Kalebe Leonardo Cutrim Freitas, RGM: 47211431
+Cauê Soares Gomes Alves, RGM: 47207094
+Arthur Marques Silva, RGM: 4711793-1
 ---
 
 # Modelagem de Banco de Dados para a JG Construções
