@@ -34,6 +34,20 @@ Contato: (11) 8161-3422 · jovaldo.santos@hotmail.com
 
 ![DER - JG Construções](DER.png)
 
+
+Ao revisar o DER, foram encontradas inconsistências entre o desenho dos relacionamentos, as chaves estrangeiras declaradas e as regras de negócio (RF01–RF10). Os ajustes realizados foram:
+ 
+| # | Problema no DER original | Ajuste | Justificativa |
+|---|---|---|---|
+| 1 | `OBRA.tipo_servico` é texto livre; uma obra pode ter vários serviços (pintura e elétrica). O DER também liga Obra a Serviço ("é de") sem FK em nenhuma das tabelas. | Criada a entidade associativa `OBRA_SERVICO` (N:N). Removido `tipo_servico` de `OBRA`. | Atende RF03/RF04 (associar serviços às obras) e evita atributo multivalorado (1FN). |
+| 2 | `SERVICO.tempo_estimado` depende da obra, não do serviço (o serviço já tem `tempo_padrao`). | `tempo_estimado` movido para `OBRA_SERVICO`; adicionado `tempo_real`. | Elimina dependência parcial (2FN) e permite medir desvio de prazo. |
+| 3 | `PINTURA`, `ELÉTRICA`, `HIDRÁULICA` e `ACABAMENTO` têm estrutura idêntica (`descricao`, `data_execucao`, `responsavel`). | Consolidadas em `OBRA_SERVICO`; o tipo é dado por `SERVICO.tipo`. | Evita 4 tabelas duplicadas; um novo tipo de serviço (ex.: manutenção, citada em RF03) vira apenas uma linha em `SERVICO`, sem nova tabela. |
+| 4 | `FUNCIONARIO.id_obra` e `PRESTADOR.id_obra` prendem a pessoa a uma única obra. | Criadas `ALOCACAO_FUNCIONARIO` e `ALOCACAO_PRESTADOR` (N:N). | Na prática, um profissional atua em várias obras ao longo do tempo. |
+| 5 | `responsavel` (texto) nas tabelas de serviço. | Vira FK para `FUNCIONARIO` ou `PRESTADOR` em `OBRA_SERVICO`. | Integridade referencial e rastreabilidade (RF05, RF08). |
+| 6 | O relacionamento "elabora" ligava Funcionário a Prestador (1:1), sem respaldo nos requisitos. | Reinterpretado como *Funcionário elabora Orçamento* (1:N), com FK em `ORCAMENTO`. | Atende RF06 (elaboração de orçamentos) e dá respaldo ao relacionamento nos requisitos. |
+| 7 | `ORCAMENTO.id_cliente` é redundante: orçamento → obra → cliente. | Removido; o cliente é obtido via `OBRA`. | Elimina dependência transitiva (3FN) e risco de inconsistência. |
+| 8 | `PAGAMENTO` ligado a `SERVIÇO` no desenho, mas com FK para `ORCAMENTO` na tabela. | Mantida apenas a relação Orçamento 1:N Pagamento. | Pagamentos quitam orçamentos (RF07). |
+| 9 | `MATERIAL` tinha `id_obra` (um material em uma obra só) e o desenho o ligava a Orçamento/Hidráulica. | `MATERIAL` vira catálogo; `OBRA_MATERIAL` (N:N) registra quantidade por obra e, opcionalmente, o serviço que o utilizou. Adicionado `custo_unitario`. | O mesmo material é usado em várias obras (2FN); habilita análise de custo. |
 ---
 
 ### Processos de Negócio
