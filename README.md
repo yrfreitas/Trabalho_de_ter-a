@@ -52,7 +52,7 @@ Ao revisar o DER, foram encontradas inconsistências entre o desenho dos relacio
 
 ## Conversão do Modelo Conceitual para o Modelo Lógico
  
-#### 1.2.1 Entidades → Tabelas
+####  Entidades → Tabelas
  
 | Entidade (DER) | Tabela (lógico) | Observação |
 |---|---|---|
@@ -69,7 +69,7 @@ Ao revisar o DER, foram encontradas inconsistências entre o desenho dos relacio
  
 **Total: 12 tabelas.**
  
-#### 1.2.2 Atributos → Colunas
+####  Atributos → Colunas
  
 Cada atributo virou uma coluna com tipo SQL mantido do DER (`int`, `varchar(n)`, `decimal(10,2)`, `date`). Alterações:
  
@@ -78,7 +78,7 @@ Cada atributo virou uma coluna com tipo SQL mantido do DER (`int`, `varchar(n)`,
 - `responsavel` (varchar) foi substituído por colunas FK.
 - Atributos de data e status ganharam `DEFAULT` e `CHECK` (ver [1.5](#15-justificativas-técnicas-das-decisões)).
 - Novas colunas: `obra_servico.tempo_real`, `obra_servico.valor_contratado`, `material.custo_unitario`, `orcamento.id_funcionario`.
-#### 1.2.3 Relacionamentos → Chaves e 1.2.4 Cardinalidades
+####  Relacionamentos → Chaves e  Cardinalidades
  
 | Relacionamento | Cardinalidade | Como foi traduzido |
 |---|---|---|
