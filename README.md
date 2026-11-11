@@ -143,6 +143,56 @@ Só importa onde há chave composta ou conceito N:N:
 - **Por que foi necessária:** reduzir risco de anomalias de atualização (ex.: trocar o cliente da obra e esquecer o orçamento).
 ---
 
+## Justificativas Técnicas das Decisões
+ 
+#### Chaves primárias
+ 
+- **Chaves substitutas inteiras (`id_*`)** nas entidades principais: CPF/CNPJ e e-mail podem mudar ou ser corrigidos; um identificador numérico é estável, compacto e eficiente em JOINs. CPF/CNPJ continua protegido por `UNIQUE`.
+- **PK composta em `alocacao_funcionario` e `alocacao_prestador`:** a identidade da alocação é o trio (obra, pessoa, `data_inicio`). Incluir `data_inicio` impede duplicidade da mesma alocação, mas permite que um profissional seja realocado à mesma obra em outro período, o que o par (obra, pessoa) sozinho não permitiria.
+- **`id_obra_servico` e `id_obra_material` substitutos:** a mesma combinação pode se repetir legitimamente (ex.: duas demãos de pintura), e `obra_material` precisa ser referenciada opcionalmente por `id_obra_servico`.
+#### Chaves estrangeiras e relacionamentos
+ 
+| FK | Relacionamento implementado | Política de exclusão |
+|---|---|---|
+| `obra.id_cliente` | Cliente 1:N Obra | `RESTRICT` — não apagar cliente com obras (histórico). |
+| `orcamento.id_obra` | Obra 1:N Orçamento | `RESTRICT` |
+| `orcamento.id_funcionario` | Funcionário elabora Orçamento | `RESTRICT` |
+| `pagamento.id_orcamento` | Orçamento 1:N Pagamento | `RESTRICT` — registros financeiros não somem. |
+| `obra_servico.*` | Obra N:N Serviço; execução por funcionário/prestador | `RESTRICT` em `servico`, `funcionario`, `prestador`; `CASCADE` em `obra`. |
+| `alocacao_*`, `obra_material` | N:N | `CASCADE` ao remover a obra (dados dependentes); `RESTRICT` para pessoa/material. |
+ 
+Em geral: dados financeiros e históricos usam `RESTRICT` (atende RF01 — exclusão controlada — e RF09 — relatórios); só dados puramente dependentes de uma obra usam `CASCADE`.
+ 
+#### Restrições aplicadas
+ 
+**Unicidade (`UNIQUE`):** `cliente.cpf_cnpj`, `cliente.email`, `funcionario.cpf`, `funcionario.email`, `prestador.cpf` e `servico.descricao`. A tabela `obra_servico` não tem restrição de unicidade, por design.
+ 
+**Obrigatoriedade (`NOT NULL`):** nomes, documentos, FKs obrigatórias, datas de início/emissão, status, valores.
+**Opcionais:** `obra.data_fim`, `obra_servico.tempo_real`, e-mail do prestador.
+ 
+**Valores permitidos (`CHECK`):**
+ 
+- `obra.status ∈ {Planejada, Em andamento, Pausada, Concluída, Cancelada}`
+- `orcamento.status ∈ {Pendente, Aprovado, Rejeitado, Expirado}`
+- `pagamento.status ∈ {Pendente, Pago, Atrasado, Estornado}`
+- `pagamento.forma_pagamento ∈ {PIX, Boleto, Cartão, Dinheiro, Transferência}`
+- `servico.tipo ∈ {Pintura, Elétrica, Hidráulica, Acabamento, Manutenção}`
+- Valores monetários `>= 0` (`pagamento.valor > 0`); tempos e quantidades `> 0`
+- `obra.data_fim >= data_inicio`
+- `obra_servico`: ao menos um executor (`id_funcionario` ou `id_prestador`) informado.
+**Padrões (`DEFAULT`):** `data_cadastro = CURRENT_DATE`, status iniciais.
+ 
+#### Decisões arquiteturais gerais
+ 
+1. **3FN como alvo** (premissa do DER): equilíbrio entre integridade e simplicidade de consultas.
+2. **Generalização em vez de 4 tabelas por especialidade:** reduz duplicação e dá extensibilidade.
+3. **Catálogo × instância** (`servico`/`material` × `obra_servico`/`obra_material`): padroniza preços e permite comparar o previsto com o realizado.
+4. **Histórico preservado:** `RESTRICT` e status em vez de exclusão física.
+5. **LGPD:** dados pessoais (CPF, e-mail, telefone) concentrados em `cliente`, `funcionario` e `prestador`, facilitando controle de acesso por perfil, mascaramento e anonimização.
+6. **Preparado para crescimento:** novos tipos de serviço, formas de pagamento e status exigem só inserção/ajuste de `CHECK`, sem mudar a estrutura.
+---
+
+
 #### Requisitos Funcionais
 
 RF01 – Cadastrar clientes
