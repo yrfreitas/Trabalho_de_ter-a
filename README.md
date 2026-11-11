@@ -1,4 +1,4 @@
-# Entrega 1 — Modelo Conceitual (DER)
+# Entrega 2 — Relatorio Tecnico Final 
 ### Modelagem de um sistema de gestão de informações para uma organização de pequeno porte
 
 Grupo; Clara Victoria Soares Cardoso, Kalebe Leonardo Cutrim Freitas,Cauê Soares Gomes Alves e Arthur Marques Silva 
@@ -511,7 +511,7 @@ Ele está versionado no repositório, em dois arquivos:
 
 ---
 
-### Diagrama Entidade-Relacionamento (DER)
+### Diagrama Modelo Conceitual (DER)
 
 ![DER - JG Construções](DER.png)
 
