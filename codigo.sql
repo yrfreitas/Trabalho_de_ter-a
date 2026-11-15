@@ -446,3 +446,68 @@ WHERE ob.status IN ('Em andamento','Pausada')
 GROUP BY ob.id_obra, c.nome, ob.status, ob.data_prevista_fim
 ORDER BY ob.id_obra;
 
+-- Gerenciar saldo devedor por cliente 
+
+SELECT
+    p.id_pagamento,
+    c.nome AS cliente,
+    p.id_obra,
+    p.valor_pago,
+    p.numero_parcela,
+    p.status_pagamento
+FROM pagamento p
+INNER JOIN cliente c
+    ON p.id_cliente = c.id_cliente
+WHERE p.status_pagamento IN ('Pendente', 'Atrasado');
+
+-- Consultar pagamentos pendentes e atrasados 
+
+SELECT
+    c.nome AS cliente,
+    ob.id_obra,
+    o.id_orcamento,
+    o.valor_total AS valor_orcado,
+
+    COALESCE(
+        SUM(CASE
+            WHEN p.status = 'Pago' THEN p.valor
+        END), 0
+    ) AS total_pago,
+
+    o.valor_total - COALESCE(
+        SUM(CASE
+            WHEN p.status = 'Pago' THEN p.valor
+        END), 0
+    ) AS saldo_devedor,
+
+    COALESCE(
+        SUM(CASE
+            WHEN p.status = 'Atrasado' THEN p.valor
+        END), 0
+    ) AS valor_em_atraso
+
+FROM orcamento o
+
+JOIN obra ob
+    ON ob.id_obra = o.id_obra
+
+JOIN cliente c
+    ON c.id_cliente = ob.id_cliente
+
+LEFT JOIN pagamento p
+    ON p.id_orcamento = o.id_orcamento
+
+WHERE o.status = 'Aprovado'
+
+GROUP BY
+    c.nome,
+    ob.id_obra,
+    o.id_orcamento,
+    o.valor_total
+
+HAVING saldo_devedor > 0
+
+ORDER BY
+    valor_em_atraso DESC,
+    saldo_devedor DESC;
+
