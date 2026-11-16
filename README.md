@@ -9,6 +9,16 @@ Arthur Marques Silva RGM: 4711793-1,
 
 # Modelagem de Banco de Dados para a JG Construções
 
+## Apresentação do Projeto
+
+*Projeto:* Banco de Dados – JG Construções
+
+*Vídeo de apresentação:*
+
+[Assistir à apresentação no YouTube](Apresentação do Projeto - Banco de Dados JG Construções
+https://youtu.be/gxlB5DOO1zE)
+
+
 
 ## Introdução
 
@@ -762,7 +772,6 @@ DATE, C. J. **Introdução a Sistemas de Bancos de Dados**. 8. ed. Rio de Janeir
 
 ## Critérios Atitudinais 
 *(avaliados por Avaliação 360º entre os integrantes do grupo — não é conteúdo deste README)*
-
 
 
 
