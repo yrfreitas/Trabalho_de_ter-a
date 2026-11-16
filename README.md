@@ -15,7 +15,7 @@ Arthur Marques Silva RGM: 4711793-1,
 
 *Vídeo de apresentação:*
 
-[Assistir à apresentação no YouTube](Apresentação do Projeto - Banco de Dados JG Construções
+(Apresentação do Projeto - Banco de Dados JG Construções
 https://youtu.be/gxlB5DOO1zE)
 
 
